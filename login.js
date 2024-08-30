@@ -45,6 +45,7 @@ router.post("/login", async (req, res) => {
       dataArr = [ip, response.openid];
     }
     const token = response.session_key + response.openid;
+    // 创建或更新ip
     await pool
       .query(mysql, dataArr)
       .then((data) => {
@@ -53,7 +54,6 @@ router.post("/login", async (req, res) => {
             response.openid
           }，用户ip：${ip}`
         );
-
         res.json({
           code: 200,
           msg: `${isNewUser ? "注册" : "更新"}用户ip成功`,

@@ -1,4 +1,3 @@
-const { log } = require("console");
 const client = require("./ossInfo.js");
 const multer = require("multer");
 
