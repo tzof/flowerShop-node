@@ -1,12 +1,18 @@
 const express = require("express");
 const cors = require("cors");
 
+// 加载环境变量
+require("dotenv").config();
+
 const ossApi = require("./ossApi");
 const loginApi = require("./login");
 const userinfoApi = require("./userInfo");
 
 const https = require("https");
 const fs = require("fs");
+
+
+
 
 // 引入接口模块
 // var api = require("./api.js");
