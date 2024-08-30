@@ -1,10 +1,11 @@
+const { log } = require("console");
 const client = require("./ossInfo.js");
 const multer = require("multer");
 
 const router = require("express").Router();
 // 创建 Multer 中间件实例
 const storage = multer.memoryStorage(); // 使用内存存储以避免文件写入磁盘
-const upload = multer({ storage: storage });
+const upload = multer({ storage: storage }); // storage存储引擎，它定义了如何处理上传的文件
 // 上传文件到 OSS
 async function uploadFileToOSS(file) {
   try {
