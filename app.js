@@ -30,7 +30,7 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// 设置全局中间件，但允许特定路由绕过验证
+// 设置全局中间件验证所有接口请求头是否包含token并合法，但允许特定路由绕过验证
 app.use((req, res, next) => {
   const publicRoutes = ["/login"]; // 允许特定路由绕过验证
   const routeNeedsAuth = !publicRoutes.includes(req.path);
