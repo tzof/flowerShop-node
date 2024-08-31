@@ -1,6 +1,7 @@
 const rp = require("request-promise-native");
 const router = require("express").Router();
 const pool = require("./mysqlInfo");
+const jwt = require("jsonwebtoken");
 
 router.post("/login", async (req, res) => {
   const { code } = req.body;
@@ -44,7 +45,12 @@ router.post("/login", async (req, res) => {
       mysql = `UPDATE user SET updateIp = ? WHERE openId = ?`;
       dataArr = [ip, response.openid];
     }
-    const token = response.session_key + response.openid;
+    // sign()内 第一个参数表示要存储在token中的信息(在验证verify方法内返回的user内展示所以得为对象形式) 第二个参数表示代表了用于签名的密钥 第三个参数表示jwt过期时间单位秒
+    const token = jwt.sign(
+      { openid: response.openid },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: 60 * 60 }
+    );
     // 创建或更新ip
     await pool
       .query(mysql, dataArr)

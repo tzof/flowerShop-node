@@ -5,19 +5,20 @@ const pool = require("./mysqlInfo");
 router.post("/getUserinfo", async (req, res) => {
   const openId = req.body.openId;
   const mysql = `SELECT * FROM user WHERE openId = ?`;
-  await pool
-    .query(mysql, [openId])
-    .then((data) => {
-      res.json({
-        code: 200,
-        msg: "获取用户信息成功",
-        data: data[0],
-      })
-    })
-})
+  await pool.query(mysql, [openId]).then((data) => {
+    console.log("获取用户信息成功", data[0]);
+    res.json({
+      code: 200,
+      msg: "获取用户信息成功",
+      data: data[0],
+    });
+  });
+});
 
 // 设置用户信息
 router.post("/setUserinfo", async (req, res) => {
+  console.log(req.path);
+  
   const reqData = req.body;
   let isNewUser = false; // 判断是否为新用户
   const ip = String(req.ip);
