@@ -7,6 +7,13 @@ router.post("/login", async (req, res) => {
   const { code } = req.body;
   const appId = process.env.WECHARTPROGRAM_APPID;
   const secret = process.env.WECHARTPROGRAM_SECRET;
+  if (!code) {
+    res.json({
+      code: 0,
+      msg: "code为空",
+    });
+    return;
+  }
   try {
     const options = {
       uri: `https://api.weixin.qq.com/sns/jscode2session`,
