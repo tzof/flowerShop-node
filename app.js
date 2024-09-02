@@ -8,14 +8,15 @@ require("dotenv").config();
 const ossApi = require("./ossApi");
 const loginApi = require("./login");
 const userinfoApi = require("./userInfo");
-
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocs = require('./swagger'); // 引入你之前配置的swagger.js
 const https = require("https");
 const fs = require("fs");
 
 const app = express();
 // 跨域配置 模块
 app.use(cors());
-
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 // JWT 验证中间件
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
