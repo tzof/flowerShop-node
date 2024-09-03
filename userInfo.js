@@ -1,9 +1,40 @@
 const router = require("express").Router();
 const pool = require("./mysqlInfo");
-
+/**
+ * 获取用户信息
+ * @openapi
+ * /getUserinfo:
+ *   get:
+ *     summary: 根据openId获取用户信息
+ *     tags: [User]
+ *     parameters:
+ *       - in: query
+ *         name: openId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     security:
+ *       - jwtAuth: []
+ *     responses:
+ *       200:
+ *         description: 成功获取用户信息
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 openId:
+ *                   type: string
+ *                 nickname:
+ *                   type: string
+ *                 avatarfileName:
+ *                   type: string
+ *                 avatarUrl:
+ *                   type: string
+ */
 // 获取用户信息
-router.post("/getUserinfo", async (req, res) => {
-  const openId = req.body.openId;
+router.get("/getUserinfo", async (req, res) => {
+  const openId = req.query.openId;
   const mysql = `SELECT * FROM user WHERE openId = ?`;
   await pool.query(mysql, [openId]).then((data) => {
     console.log("获取用户信息成功", data[0]);
@@ -14,43 +45,11 @@ router.post("/getUserinfo", async (req, res) => {
     });
   });
 });
-/**
- * 获取用户登录Token
- * @swagger
- * /user:
- *   get:
- *     summary: 根据登录凭证code获取Token
- *     description: 用户通过此接口发送他们的登录凭证code以换取一个访问令牌。
- *     tags: [用户管理]
- *     parameters:
- *       - in: query
- *         name: code
- *         schema:
- *           type: string
- *         required: true
- *         description: 登录凭证code，从前端获取
- *     responses:
- *       200:
- *         description: 成功响应，返回包含Token的对象
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *       400:
- *         description: 错误响应，如果code无效或缺少
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Invalid or missing code."
- */
+// *       - in: header
+// *         name: X-Custom-Header
+// *         required: true
+// *         schema:
+// *           type: string
 // 设置用户信息
 router.post("/setUserinfo", async (req, res) => {
   console.log(req.path);

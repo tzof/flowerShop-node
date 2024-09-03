@@ -56,7 +56,9 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign(
       { openid: response.openid },
       process.env.JWT_SECRET_KEY,
-      { expiresIn: 60 * 60 }
+      {
+        expiresIn: 60 * 60,
+      }
     );
     // 创建或更新ip
     await pool

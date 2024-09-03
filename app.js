@@ -8,19 +8,19 @@ require("dotenv").config();
 const ossApi = require("./ossApi");
 const loginApi = require("./login");
 const userinfoApi = require("./userInfo");
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocs = require('./swagger'); // 引入你之前配置的swagger.js
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocs = require("./swagger"); // 引入你之前配置的swagger.js
 const https = require("https");
 const fs = require("fs");
 
 const app = express();
 // 跨域配置 模块
 app.use(cors());
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 // JWT 验证中间件
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
-  const token = authHeader;
+  const token = authHeader && authHeader.split(" ")[1]; // 解析Bearer JWT格式的token
   if (token == null) return res.sendStatus(401); // 如果没有提供 token，则返回 401 Unauthorized
   // verify()验证JWT的合法性和完整性 第一个参数要解析的token 第二个参数是密钥 第三个参数是回调函数(err,user)
   jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
