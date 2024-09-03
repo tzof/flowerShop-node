@@ -43,11 +43,11 @@ module.exports = specs;
 
 // JSDoc注释 写法说明
 
-// post方法 传递json或者form-data数据
+// post方法 传递json、form-data、x-www-form-urlencoded数据
 /**
  * 获取用户信息
  * swagger // 告诉swagger-jsdoc工具，接下来的注释应该被解析为@swagger或@openapi文档的一部分。
- * /setUserinfo:  接口路由
+ * /setUserinfo:  // 接口路由
  *   post: // 请求方式
  *     summary: 根据openId获取用户信息 // 总结概述
  *     tags: [User]  // 标签，可以将API归类到一个或多个标签下
@@ -81,7 +81,7 @@ module.exports = specs;
 /**
  * 获取用户信息
  * swagger // 告诉swagger-jsdoc工具，接下来的注释应该被解析为@swagger或@openapi文档的一部分。
- * /setUserinfo:  接口路由
+ * /setUserinfo:  // 接口路由
  *   get: // 请求方式
  *     summary: 根据openId获取用户信息 // 总结概述
  *     tags: [User]  // 标签，可以将API归类到一个或多个标签下

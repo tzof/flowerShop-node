@@ -45,11 +45,55 @@ router.get("/getUserinfo", async (req, res) => {
     });
   });
 });
+
 // *       - in: header
 // *         name: X-Custom-Header
 // *         required: true
 // *         schema:
 // *           type: string
+
+// post方法 传递json或者form-data数据
+/**
+ * 获取用户信息
+ * @swagger
+ * /setUserinfo:
+ *   post:
+ *     summary: 设置用户信息
+ *     tags: [User]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               openId:
+ *                 type: string
+ *                 description: 用户唯一标识码
+ *                 required: true
+ *               avatarfileName:
+ *                 type: string
+ *                 description: 用户头像文件名
+ *               avatarUrl:
+ *                 type: string
+ *                 description: 用户头像地址
+ *               nickname:
+ *                 type: string
+ *                 description: 用户昵称
+ *                 example: "张三"
+ *
+ *     responses:
+ *       200:
+ *         description: 成功获取用户信息
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: number
+ */
 // 设置用户信息
 router.post("/setUserinfo", async (req, res) => {
   console.log(req.path);
