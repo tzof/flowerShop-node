@@ -2,7 +2,7 @@ const swaggerJsDoc = require("swagger-jsdoc");
 
 const options = {
   definition: {
-    openapi: "3.0.0",
+    openapi: "3.1.0",
     info: {
       title: "花城api文档",
       version: "1.0.0",
@@ -11,13 +11,13 @@ const options = {
     },
     
     components: { // 全局自定义组件
-      parameters: { // 定义全局参数 params传参和head传参使用
-        AuthHeader: { // 自定义参数名称
-          in: "header", // 指定参数位置 header表示请求头 path表示get的params的传参
+      parameters: { // 定义全局参数，query传参和设置header请求头使用
+        XCustomHeader: { // 自定义组件名
+          in: "header", // 指定参数位置 header表示请求头 query表示get的query的传参
           name: "X-Custom-Header", // 参数名称
+          type: "string", // 指定参数类型
           description: "改变请求头X-Custom-Header", // 描述
           required: true, // 是否必填
-          type: "string", // 指定参数类型
         },
       },
       securitySchemes: { // 定义全局安全方案机制 使用的时候security内调用 security: - jwtAuth: []
@@ -42,6 +42,7 @@ const specs = swaggerJsDoc(options);
 module.exports = specs;
 
 // JSDoc注释 写法说明
+// https://editor.swagger.io/?spm=5176.28103460.0.0.32735d27VIMi8d 官方编辑器可以验证和参考里面的yaml文件
 /**
  * swagger // 告诉swagger-jsdoc工具，接下来的注释应该被解析为@swagger或@openapi文档的一部分。
  * /setUserinfo:  // 接口路由
@@ -63,7 +64,7 @@ module.exports = specs;
  *           type: string // 数据类型
  *     requestBody: // 定义请求体,req.body(request body)的信息。 传递json、form-data、x-www-form-urlencoded数据的时候使用
  *       required: true // 是否必填。对于整个请求体不是指定某个字段。
- *       description: 需要的请求体。对于整个请求体的描述。
+ *       description: 需要的请求体 // 对于整个请求体的描述。
  *       content: // 开始定义请求体内容
  *         application/json: // 指定了请求体内容格式为json，可以为json、multipart/form-data、application/x-www-form-urlencoded等请求体的格式
  *           schema: // 开始定义内容
@@ -84,7 +85,7 @@ module.exports = specs;
  *                 description: 上传的文件 // 描述
  *     responses: // 响应结果 返回报文
  *       200: // 定义了HTTP状态码为200的时候的响应结果
- *         description: 成功获取用户信息 // 描述
+ *         description: 成功获取用户信息 // 返回结果整体描述
  *         content: // 开始定义返回体内容
  *           application/json: // 指定了返回内容类型为json
  *             schema: // 开始定义内容
@@ -95,6 +96,6 @@ module.exports = specs;
  *                 msg: // 属性名
  *                   type: string // 属性数据类型
  *                   default: 成功 // 默认值
- *       400: // 定义了HTTP状态码为400时的情况
- *         description: 请求参数错误 // 描述
+ *       400: // 定义了HTTP状态码为400的时候的响应结果
+ *         description: 请求参数错误 // 返回结果整体描述
  */

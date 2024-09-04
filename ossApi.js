@@ -57,6 +57,7 @@ async function generateSignedUrl() {
 }
 
 /**
+ * 上传文件到oss
  * @swagger
  * /upload:
  *   post:
