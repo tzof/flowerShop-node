@@ -2,7 +2,7 @@ const router = require("express").Router();
 const pool = require("./mysqlInfo");
 /**
  * 获取用户信息
- * @openapi
+ * @swagger
  * /getUserinfo:
  *   get:
  *     summary: 根据openId获取用户信息
@@ -11,6 +11,7 @@ const pool = require("./mysqlInfo");
  *       - in: query
  *         name: openId
  *         required: true
+ *         description: 用户的openId
  *         schema:
  *           type: string
  *     security:
@@ -46,11 +47,6 @@ router.get("/getUserinfo", async (req, res) => {
   });
 });
 
-// *       - in: header
-// *         name: X-Custom-Header
-// *         required: true
-// *         schema:
-// *           type: string
 
 // post方法 传递json或者form-data数据
 /**
@@ -67,22 +63,24 @@ router.get("/getUserinfo", async (req, res) => {
  *         application/x-www-form-urlencoded:
  *           schema:
  *             type: object
+ *             required: ["openId"]
  *             properties:
  *               openId:
  *                 type: string
- *                 description: 用户唯一标识码
- *                 required: true
+ *                 default: ""
+ *                 description: 用户的openId
  *               avatarfileName:
  *                 type: string
- *                 description: 用户头像文件名
+ *                 default: ""
+ *                 description: 头像文件名
  *               avatarUrl:
  *                 type: string
- *                 description: 用户头像地址
+ *                 default: ""
+ *                 description: 头像地址
  *               nickname:
  *                 type: string
- *                 description: 用户昵称
- *                 example: "张三"
- *
+ *                 default: ""
+ *                 description: 昵称
  *     responses:
  *       200:
  *         description: 成功获取用户信息
@@ -91,13 +89,12 @@ router.get("/getUserinfo", async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: number
+ *                 msg:
+ *                   type: string
+ *                   default: 创建/更新用户信息成功
  */
 // 设置用户信息
 router.post("/setUserinfo", async (req, res) => {
-  console.log(req.path);
-
   const reqData = req.body;
   let isNewUser = false; // 判断是否为新用户
   const ip = String(req.ip);

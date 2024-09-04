@@ -3,6 +3,36 @@ const router = require("express").Router();
 const pool = require("./mysqlInfo");
 const jwt = require("jsonwebtoken");
 
+/**
+ * 登录
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: 微信小程序登录
+ *     tags: [Login]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: ["code"]
+ *             properties:
+ *               code:
+ *                 type: string
+ *                 description: 微信的临时登录凭证
+ *     responses:
+ *       200:
+ *         description: 成功获取用户信息
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   defautl: 登录成功
+ */
+// 登录
 router.post("/login", async (req, res) => {
   const { code } = req.body;
   const appId = process.env.WECHARTPROGRAM_APPID;

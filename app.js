@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const bodyParser = require('body-parser');
 
 // 加载环境变量
 require("dotenv").config();
@@ -44,6 +45,8 @@ app.use((req, res, next) => {
 
 // 解析json
 app.use(express.json());
+// 解析x-www-form-urlencoded数据
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(ossApi);
 app.use(loginApi);

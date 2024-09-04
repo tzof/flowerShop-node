@@ -56,6 +56,40 @@ async function generateSignedUrl() {
   }
 }
 
+/**
+ * @swagger
+ * /upload:
+ *   post:
+ *     summary: 上传文件到OSS并返回可访问地址
+ *     tags: [OSS]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: ["file"]
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: 上传的文件
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   default: "上传成功"
+ *                 avatarUrl:
+ *                   type: string
+ *                 fileName:
+ *                   type: string
+ */
 // 文件上传路由
 router.post("/upload", upload.single("file"), async (req, res) => {
   try {
@@ -76,8 +110,5 @@ router.post("/upload", upload.single("file"), async (req, res) => {
     res.json({ code: 0, success: false, message: "文件上传失败" });
   }
 });
-
-// 文件下载
-router.post("/upload", upload.single("file"), async (req, res) => {});
 
 module.exports = router;
