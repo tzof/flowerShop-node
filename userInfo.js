@@ -1,21 +1,43 @@
 const router = require("express").Router();
 const pool = require("./mysqlInfo");
+const client = require("./ossInfo.js");
+// 生成带签名的URL oss签名URL
+async function generateSignedUrl(fileName) {
+  try {
+    const objectName = fileName;
+    const expires = 3600; // 过期时间，单位秒
+    // 生成带签名的URL
+    const url = await client.signatureUrl(objectName, { expires });
+    console.log(url, "++++++++++++++++++");
+    return url;
+  } catch (error) {
+    console.error(
+      "Error generating signed URL:",
+      error,
+      "+++++++++++++++++++++++++++"
+    );
+  }
+}
 /**
  * 获取用户信息
  * @swagger
  * /getUserinfo:
- *   get:
+ *   post:
  *     summary: 根据openId获取用户信息
  *     tags: [User]
- *     parameters:
- *       - in: query
- *         name: openId
- *         required: true
- *         description: 用户的openId
- *         schema:
- *           type: string
  *     security:
  *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             required: ["openId"]
+ *             properties:
+ *               openId:
+ *                 type: string
+ *                 default: ""
+ *                 description: 用户的openId
  *     responses:
  *       200:
  *         description: 成功获取用户信息
@@ -34,19 +56,24 @@ const pool = require("./mysqlInfo");
  *                   type: string
  */
 // 获取用户信息
-router.get("/getUserinfo", async (req, res) => {
-  const openId = req.query.openId;
+router.post("/getUserinfo", async (req, res) => {
+  const openId = req.body.openId;
   const mysql = `SELECT * FROM user WHERE openId = ?`;
-  await pool.query(mysql, [openId]).then((data) => {
-    console.log("获取用户信息成功", data[0]);
+  await pool.query(mysql, [openId]).then(async (data) => {
+    let resData = data[0][0];
+    console.log(req.body, data, "获取用户信息成功", resData);
+    const avatarUrl = (resData && await generateSignedUrl(resData.avatarfileName)).replace(
+      "http://tzof-oss.oss-cn-hangzhou.aliyuncs.com",
+      "https://oss.tzof.net"
+    );
+    resData.avatarUrl = avatarUrl;
     res.json({
       code: 200,
       msg: "获取用户信息成功",
-      data: data[0],
+      data: resData,
     });
   });
 });
-
 
 // post方法 传递json或者form-data数据
 /**

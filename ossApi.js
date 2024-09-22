@@ -15,7 +15,8 @@ async function uploadFileToOSS(file) {
     let index = originalname.lastIndexOf(".");
     let name = originalname.substring(0, index);
     let typeName = originalname.substring(index + 1);
-    fileName = name + "-" + new Date().getTime() + "." + typeName;
+    let pathName = process.env.OSS_PATH; // 存储路径。不加存储路径默认就是根目录
+    fileName = pathName + "/" + name + "-" + new Date().getTime() + "." + typeName;
     await client.put(fileName, file.buffer);
     console.log(file);
     return `https://oss.tzof.net/${fileName}`;
@@ -43,7 +44,7 @@ async function downloadFile() {
   }
 }
 
-// 生成带签名的URL
+// 生成带签名的URL oss签名URL
 async function generateSignedUrl() {
   try {
     const objectName = fileName;
@@ -99,7 +100,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
       "http://tzof-oss.oss-cn-hangzhou.aliyuncs.com",
       "https://oss.tzof.net"
     );
-    console.log("文件上传成功文件名：", fileName, "访问地址：", fileUrl);
+    console.log("文件上传成功路径加文件名：", fileName, "访问地址：", fileUrl);
     res.json({
       code: 200,
       msg: `上传成功`,

@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 
 // 加载环境变量
 require("dotenv").config();
@@ -17,7 +17,14 @@ const fs = require("fs");
 const app = express();
 // 跨域配置 模块
 app.use(cors());
+
+// swagger文档
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+// 解析json
+app.use(express.json());
+// 解析x-www-form-urlencoded数据
+app.use(bodyParser.urlencoded({ extended: false }));
 // JWT 验证中间件
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -36,17 +43,17 @@ function authenticateToken(req, res, next) {
 app.use((req, res, next) => {
   const publicRoutes = ["/login"]; // 允许特定路由绕过验证
   const routeNeedsAuth = !publicRoutes.includes(req.path);
+  console.log("请求路径", req.path);
+  console.log("是否需要验证", routeNeedsAuth);
+  console.log("请求头", req.headers);
+  console.log("请求体", req.body);
+  console.log("请求参数", req.query);
   if (routeNeedsAuth) {
     authenticateToken(req, res, next);
   } else {
     next();
   }
 });
-
-// 解析json
-app.use(express.json());
-// 解析x-www-form-urlencoded数据
-app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(ossApi);
 app.use(loginApi);
