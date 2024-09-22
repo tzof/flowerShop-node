@@ -9,8 +9,12 @@ require("dotenv").config();
 const ossApi = require("./ossApi");
 const loginApi = require("./login");
 const userinfoApi = require("./userInfo");
+const homeApi = require("./home");
+const goodsApi = require("./goods");
+
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocs = require("./swagger"); // 引入你之前配置的swagger.js
+
 const https = require("https");
 const fs = require("fs");
 
@@ -49,7 +53,8 @@ app.use((req, res, next) => {
   console.log("请求体", req.body);
   console.log("请求参数", req.query);
   if (routeNeedsAuth) {
-    authenticateToken(req, res, next);
+    // authenticateToken(req, res, next);
+    next();
   } else {
     next();
   }
@@ -58,6 +63,8 @@ app.use((req, res, next) => {
 app.use(ossApi);
 app.use(loginApi);
 app.use(userinfoApi);
+app.use(homeApi);
+app.use(goodsApi);
 
 // 配置SSL证书和密钥
 const options = {

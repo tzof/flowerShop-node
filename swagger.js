@@ -11,15 +11,15 @@ const options = {
     },
     
     components: { // 全局自定义组件
-      parameters: { // 定义全局参数，query传参和设置header请求头使用
-        XCustomHeader: { // 自定义组件名
-          in: "header", // 指定参数位置 header表示请求头 query表示get的query的传参
-          name: "X-Custom-Header", // 参数名称
-          type: "string", // 指定参数类型
-          description: "改变请求头X-Custom-Header", // 描述
-          required: true, // 是否必填
-        },
-      },
+      // parameters: { // 定义全局参数，query传参和设置header请求头使用
+      //   XCustomHeader: { // 自定义组件名
+      //     in: "header", // 指定参数位置 header表示请求头 query表示get的query的传参
+      //     name: "X-Custom-Header", // 参数名称
+      //     type: "string", // 指定参数类型
+      //     description: "改变请求头X-Custom-Header", // 描述
+      //     required: true, // 是否必填
+      //   },
+      // },
       securitySchemes: { // 定义全局安全方案机制 使用的时候security内调用 security: - jwtAuth: []
         jwtAuth: { // 自定义安全方案名称
           type: "http", // 指定安全方案的类型，http类型用于定义基于HTTP协议的安全方案 包括scheme内bearer、basic、digest等子类型。https请求也使用http。

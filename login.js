@@ -73,6 +73,8 @@ router.post("/login", async (req, res) => {
         });
       });
     const ip = String(req.ip);
+    let mysql = '';
+    let dataArr = [];
     // 新用户创建ip
     if (isNewUser) {
       mysql = `INSERT INTO user (openId, createIp, updateIp) VALUES (?, ?, ?)`;
