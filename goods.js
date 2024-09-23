@@ -19,7 +19,7 @@ router.get("/goods", async (req, res) => {
     const limit = Number(reqData.pageSize) || 10;
     const offset = Number(reqData.pageNum - 1) * limit || 0;
     await pool.query(dataQuery, [limit, offset]).then((data) => {
-      res.send({
+      res.json({
         code: 200,
         msg: "查询成功",
         data: data[0],

@@ -62,7 +62,9 @@ router.post("/getUserinfo", async (req, res) => {
   await pool.query(mysql, [openId]).then(async (data) => {
     let resData = data[0][0];
     console.log(req.body, data, "获取用户信息成功", resData);
-    const avatarUrl = (resData && await generateSignedUrl(resData.avatarfileName)).replace(
+    const avatarUrl = (
+      resData && (await generateSignedUrl(resData.avatarfileName))
+    ).replace(
       "http://tzof-oss.oss-cn-hangzhou.aliyuncs.com",
       "https://oss.tzof.net"
     );
@@ -123,7 +125,6 @@ router.post("/getUserinfo", async (req, res) => {
 // 设置用户信息
 router.post("/setUserinfo", async (req, res) => {
   const reqData = req.body;
-  let isNewUser = false; // 判断是否为新用户
   const ip = String(req.ip);
   const keyArr = Object.keys(reqData);
   let valueArr = Object.values(reqData);
@@ -140,12 +141,10 @@ router.post("/setUserinfo", async (req, res) => {
   await pool
     .query(mysql, dataArr)
     .then((data) => {
-      console.log(
-        `${isNewUser ? "创建" : "更新"}用户信息成功，数据库返回：${data[0]}`
-      );
+      console.log(`${"更新"}用户信息成功，数据库返回：${data[0]}`);
       res.json({
         code: 200,
-        msg: `${isNewUser ? "创建" : "更新"}用户信息成功`,
+        msg: `${"更新"}用户信息成功`,
       });
     })
     .catch((err) => {

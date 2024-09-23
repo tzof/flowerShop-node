@@ -11,6 +11,9 @@ const loginApi = require("./login");
 const userinfoApi = require("./userInfo");
 const homeApi = require("./home");
 const goodsApi = require("./goods");
+const departmentsApi = require("./departments");
+const categoryApi = require("./category");
+const shoppingCartApi = require("./shoppingCart");
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocs = require("./swagger"); // 引入你之前配置的swagger.js
@@ -65,6 +68,9 @@ app.use(loginApi);
 app.use(userinfoApi);
 app.use(homeApi);
 app.use(goodsApi);
+app.use(departmentsApi);
+app.use(categoryApi);
+app.use(shoppingCartApi);
 
 // 配置SSL证书和密钥
 const options = {
