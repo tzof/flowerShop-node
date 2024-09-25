@@ -21,7 +21,7 @@ router.get("/goods", async (req, res) => {
     await pool.query(dataQuery, [limit, offset]).then((data) => {
       res.json({
         code: 200,
-        msg: "查询成功",
+        msg: "查询商品列表成功",
         data: data[0],
         total: totalData[0][0].total,
       });
