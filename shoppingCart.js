@@ -40,6 +40,7 @@ router.get("/getShoppingCart", async (req, res) => {
           .query(mysql)
           .then((data) => {
             item.goodsInfo = data[0][0];
+            item.totalPrices = item.goodsInfo.discounted_price * item.count;
           })
           .catch((err) => {
             console.log("error:查找购物车商品详情出错", err);
@@ -49,7 +50,6 @@ router.get("/getShoppingCart", async (req, res) => {
       promiseArr.push(promiseItem);
     });
     Promise.all(promiseArr).then(() => {
-      console.log(data[0]);
       res.json({
         code: 200,
         msg: "获取购物车成功",
@@ -58,6 +58,7 @@ router.get("/getShoppingCart", async (req, res) => {
     });
   });
 });
+
 // 添加修改购物车
 router.post("/setShoppingCart", async (req, res) => {
   const reqData = req.body;
@@ -127,6 +128,38 @@ router.post("/deleteShoppingCart", (req, res) => {
     res.json({
       code: 200,
       msg: "删除购物车成功",
+    });
+  });
+});
+
+// 修改购物车选择状态
+router.post("/setShoppingCartSelect", async (req, res) => {
+  const reqData = req.body;
+  const { carId, isSelect = false } = reqData;
+  let mysql = `
+    UPDATE shopping_cart SET isSelect = ${isSelect} WHERE carId = ${Number(
+    carId
+  )};
+  `;
+  await pool.query(mysql).then((data) => {
+    res.json({
+      code: 200,
+      msg: "修改购物车选择状态成功",
+    });
+  });
+});
+
+// 全选修改购物车选择状态
+router.post("/setShoppingCartAllSelect", async (req, res) => {
+  const reqData = req.body;
+  const { openId, isSelect = false } = reqData;
+  let mysql = `
+    UPDATE shopping_cart SET isSelect = ${isSelect} WHERE openId = '${openId}';
+  `;
+  await pool.query(mysql).then((data) => {
+    res.json({
+      code: 200,
+      msg: "修改全选购物车选择状态成功",
     });
   });
 });
