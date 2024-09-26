@@ -56,10 +56,10 @@ async function generateSignedUrl(fileName) {
  *                   type: string
  */
 // 获取用户信息
-router.post("/getUserinfo", async (req, res) => {
+router.post("/getUserinfo", (req, res) => {
   const openId = req.body.openId;
   const mysql = `SELECT * FROM user WHERE openId = ?`;
-  await pool.query(mysql, [openId]).then(async (data) => {
+  pool.query(mysql, [openId]).then(async (data) => {
     let resData = data[0][0];
     console.log(req.body, data, "获取用户信息成功", resData);
     const avatarUrl = (
@@ -123,7 +123,7 @@ router.post("/getUserinfo", async (req, res) => {
  *                   default: 创建/更新用户信息成功
  */
 // 设置用户信息
-router.post("/setUserinfo", async (req, res) => {
+router.post("/setUserinfo", (req, res) => {
   const reqData = req.body;
   const ip = String(req.ip);
   const keyArr = Object.keys(reqData);
@@ -138,7 +138,7 @@ router.post("/setUserinfo", async (req, res) => {
   valueArr = valueArr.filter((item) => item != reqData.openId);
   dataArr = [...valueArr, ip, reqData.openId];
   console.log(mysql, dataArr);
-  await pool
+  pool
     .query(mysql, dataArr)
     .then((data) => {
       console.log(`${"更新"}用户信息成功，数据库返回：${data[0]}`);
