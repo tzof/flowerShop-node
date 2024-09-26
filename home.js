@@ -2,9 +2,9 @@ const router = require("express").Router();
 const pool = require("./mysqlInfo");
 
 // 首页轮播图
-router.get("/home/carousel", (req, res) => {
+router.get("/home/carousel", async (req, res) => {
   const reqData = req.query;
-  pool.query("SELECT * FROM home_carousel").then((data) => {
+  await pool.query("SELECT * FROM home_carousel").then((data) => {
     let resData = data[0];
     res.json({
       code: 200,
@@ -15,9 +15,9 @@ router.get("/home/carousel", (req, res) => {
 });
 
 // 首页nav商品分类
-router.get("/home/nav", (req, res) => {
+router.get("/home/nav", async (req, res) => {
   const reqData = req.query;
-  pool.query("SELECT * FROM home_nav").then((data) => {
+  await pool.query("SELECT * FROM home_nav").then((data) => {
     let resData = data[0];
     res.json({
       code: 200,
@@ -28,9 +28,9 @@ router.get("/home/nav", (req, res) => {
 });
 
 // 首页活动activity
-router.get("/home/activity", (req, res) => {
+router.get("/home/activity", async (req, res) => {
   const reqData = req.query;
-  pool.query("SELECT * FROM home_activity").then((data) => {
+  await pool.query("SELECT * FROM home_activity").then((data) => {
     let resData = data[0];
     res.json({
       code: 200,

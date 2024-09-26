@@ -1,13 +1,13 @@
 const router = require("express").Router();
 const pool = require("./mysqlInfo");
 
-router.get("/goods", (req, res) => {
+router.get("/goods", async (req, res) => {
   const reqData = req.query;
   // COUNT(*) 会统计表中的所有行，包括那些包含 NULL 值的行。
   // COUNT(column_name) 会统计指定列column_nam中非 NULL 值的行数。
   // AS关键字用于给列或表指定一个别名 把 COUNT(*)指定为 total
   const countQuery = "SELECT COUNT(*) AS total FROM goods";
-  pool.query(countQuery).then((totalData) => {
+  await pool.query(countQuery).then(async (totalData) => {
     console.log(totalData[0][0].total);
     // LIMIT 用于指定每页显示的记录数，而 OFFSET 用于指定从哪一条记录开始返回数据。
     // OFFSET计算公式 = (页码 - 1) * 每页显示的记录数
@@ -18,7 +18,7 @@ router.get("/goods", (req, res) => {
     const dataQuery = `SELECT * FROM goods ORDER BY goodsId LIMIT ? OFFSET ?`;
     const limit = Number(reqData.pageSize) || 10;
     const offset = Number(reqData.pageNum - 1) * limit || 0;
-    pool.query(dataQuery, [limit, offset]).then((data) => {
+    await pool.query(dataQuery, [limit, offset]).then((data) => {
       res.json({
         code: 200,
         msg: "查询商品列表成功",

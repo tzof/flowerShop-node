@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const pool = require("./mysqlInfo");
 
-router.get("/category", (req, res) => {
+router.get("/category", async (req, res) => {
   const reqData = req.query;
   const category_id = reqData.id;
   // 不传id就返回所有一层的类别
@@ -9,7 +9,7 @@ router.get("/category", (req, res) => {
     let mysql = `
     SELECT * FROM category WHERE parent_category_id IS NULL;
   `;
-    pool.query(mysql).then((data) => {
+    await pool.query(mysql).then((data) => {
       let resData = data[0];
       console.log(reqData.id);
       res.json({
@@ -24,7 +24,7 @@ router.get("/category", (req, res) => {
     let mysql = `
     SELECT * FROM category WHERE parent_category_id = ${category_id};
   `;
-    pool.query(mysql).then((data) => {
+    await pool.query(mysql).then((data) => {
       let resData = data[0];
       console.log(reqData.id);
       res.json({
@@ -55,7 +55,7 @@ router.get("/category", (req, res) => {
     )
     SELECT * FROM DepartmentHierarchy;
   `;
-    pool.query(mysql).then((data) => {
+    await pool.query(mysql).then((data) => {
       let resData = data[0];
       console.log(reqData.id);
       // console.log(resData);

@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const pool = require("./mysqlInfo");
 
-router.get("/departments", (req, res) => {
+router.get("/departments", async (req, res) => {
   const reqData = req.query;
   let mysql = `
     WITH RECURSIVE DepartmentHierarchy AS (
@@ -20,7 +20,7 @@ router.get("/departments", (req, res) => {
     )
     SELECT * FROM DepartmentHierarchy;
   `;
-  pool.query(mysql).then((data) => {
+  await pool.query(mysql).then((data) => {
     let resData = data[0];
     console.log(resData);
     res.json({

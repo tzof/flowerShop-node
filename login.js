@@ -58,7 +58,7 @@ router.post("/login", async (req, res) => {
     const response = await rp(options);
     console.log("登录信息：", response);
     // 进入小程序自动注册openId为账号
-    pool
+    await pool
       .query("SELECT * FROM user WHERE openId = ?", [response.openid])
       .then((data) => {
         // rows第一元素查询结果 fields第二元素字段元数据例如字段名、数据类型等。
@@ -93,7 +93,7 @@ router.post("/login", async (req, res) => {
       }
     );
     // 创建或更新ip
-    pool
+    await pool
       .query(mysql, dataArr)
       .then((data) => {
         console.log(

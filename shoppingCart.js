@@ -2,14 +2,14 @@ const router = require("express").Router();
 const pool = require("./mysqlInfo");
 
 // 获取购物车总数
-router.get("/getShoppingCartTotal", (req, res) => {
+router.get("/getShoppingCartTotal", async (req, res) => {
   const reqData = req.query;
   const { openId } = reqData;
   console.log(openId);
   let mysql = `
    SELECT COUNT(*) AS total FROM shopping_cart WHERE openId = '${openId}'
   `;
-  pool.query(mysql).then((data) => {
+  await pool.query(mysql).then((data) => {
     console.log(data);
     res.json({
       code: 200,
@@ -20,23 +20,23 @@ router.get("/getShoppingCartTotal", (req, res) => {
 });
 
 // 获取购物车
-router.get("/getShoppingCart", (req, res) => {
+router.get("/getShoppingCart", async (req, res) => {
   const reqData = req.query;
   const { openId } = reqData;
   console.log(reqData);
   let mysql = `
     SELECT * FROM shopping_cart WHERE openId = '${openId}';
   `;
-  pool.query(mysql).then((data) => {
+  await pool.query(mysql).then((data) => {
     let promiseArr = [];
-    data[0].forEach((item) => {
-      let promiseItem = new Promise((resolve, reject) => {
+    data[0].forEach(async (item) => {
+      let promiseItem = new Promise(async (resolve, reject) => {
         let goodsId = item.goodsId;
         // 查询商品信息并存入返回数据
         mysql = `
           SELECT * FROM goods WHERE goodsId = ${goodsId};
         `;
-        pool
+        await pool
           .query(mysql)
           .then((data) => {
             item.goodsInfo = data[0][0];
@@ -59,7 +59,7 @@ router.get("/getShoppingCart", (req, res) => {
   });
 });
 // 添加修改购物车
-router.post("/setShoppingCart", (req, res) => {
+router.post("/setShoppingCart", async (req, res) => {
   const reqData = req.body;
   let { openId, goodsId, count } = reqData;
   goodsId = Number(goodsId);
@@ -68,7 +68,7 @@ router.post("/setShoppingCart", (req, res) => {
     let mysql = `
       DELETE FROM shopping_cart WHERE openId = '${openId}' AND goodsId = ${goodsId};
     `;
-    pool.query(mysql).then((data) => {
+    await pool.query(mysql).then((data) => {
       res.json({
         code: 200,
         msg: "删除购物车成功",
@@ -80,9 +80,9 @@ router.post("/setShoppingCart", (req, res) => {
   let mysql = `
     SELECT * FROM shopping_cart WHERE openId = '${openId}' AND goodsId = ${goodsId};
   `;
-  pool
+  await pool
     .query(mysql)
-    .then((data) => {
+    .then(async (data) => {
       console.log(data[0]);
       let isNewShopCar = false;
       // 没有则创建购物车
@@ -99,15 +99,13 @@ router.post("/setShoppingCart", (req, res) => {
       `;
       }
       console.log(mysql);
-      pool
+      await pool
         .query(mysql)
         .then((data) => {
-          setTimeout(() => {
-            res.json({
-              code: 200,
-              msg: (isNewShopCar ? "添加" : "修改") + "购物车成功",
-            });
-          }, 5000);
+          res.json({
+            code: 200,
+            msg: (isNewShopCar ? "添加" : "修改") + "购物车成功",
+          });
         })
         .catch((err) => {
           console.log("error:" + err);
@@ -118,18 +116,4 @@ router.post("/setShoppingCart", (req, res) => {
     });
 });
 
-// 删除购物车
-router.post("/deleteShoppingCart", (req, res) => {
-  const reqData = req.body;
-  const { carId } = reqData;
-  let mysql = `
-    DELETE FROM shopping_cart WHERE carId = ${Number(carId)};
-  `;
-  pool.query(mysql).then((data) => {
-    res.json({
-      code: 200,
-      msg: "删除购物车成功",
-    });
-  });
-});
 module.exports = router;
