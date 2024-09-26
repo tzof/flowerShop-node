@@ -116,4 +116,19 @@ router.post("/setShoppingCart", async (req, res) => {
     });
 });
 
+// 删除购物车
+router.post("/deleteShoppingCart", (req, res) => {
+  const reqData = req.body;
+  const { carId } = reqData;
+  let mysql = `
+    DELETE FROM shopping_cart WHERE carId = ${Number(carId)};
+  `;
+  pool.query(mysql).then((data) => {
+    res.json({
+      code: 200,
+      msg: "删除购物车成功",
+    });
+  });
+});
+
 module.exports = router;
