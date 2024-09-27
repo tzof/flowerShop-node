@@ -1,6 +1,23 @@
 const router = require("express").Router();
 const pool = require("./mysqlInfo");
 
+// 获取默认地址
+router.get("/getDefaultAddress", async (req, res) => {
+  const reqData = req.query;
+  const { openId } = reqData;
+  let mysql = `
+   SELECT * FROM address WHERE openId = '${openId}' AND is_default = 1
+  `;
+  await pool.query(mysql).then((data) => {
+    console.log(data[0][0]);
+    res.json({
+      code: 200,
+      msg: "获取默认地址成功",
+      data: data[0][0],
+    });
+  });
+});
+
 // 获取地址 默认地址降序返回 DESC升序 ASC降序(默认 可不填)
 router.get("/getAddress", async (req, res) => {
   const reqData = req.query;
