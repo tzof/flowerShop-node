@@ -73,7 +73,7 @@ router.post("/login", async (req, res) => {
         });
       });
     const ip = String(req.ip);
-    let mysql = '';
+    let mysql = "";
     let dataArr = [];
     // 新用户创建ip
     if (isNewUser) {
@@ -86,7 +86,7 @@ router.post("/login", async (req, res) => {
     }
     // sign()内 第一个参数表示要存储在token中的信息(在验证verify方法内返回的user内展示所以得为对象形式) 第二个参数表示代表了用于签名的密钥 第三个参数表示jwt过期时间单位秒
     const token = jwt.sign(
-      { openid: response.openid },
+      { openId: response.openid },
       process.env.JWT_SECRET_KEY,
       {
         expiresIn: 60 * 60,

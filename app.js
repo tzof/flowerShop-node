@@ -39,10 +39,16 @@ function authenticateToken(req, res, next) {
   const token = authHeader && authHeader.split(" ")[1]; // 解析Bearer JWT格式的token
   if (token == null) return res.sendStatus(401); // 如果没有提供 token，则返回 401 Unauthorized
   // verify()验证JWT的合法性和完整性 第一个参数要解析的token 第二个参数是密钥 第三个参数是回调函数(err,user)
-  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, data) => {
+    // data中存的是jwt.sign(data,key,time)创建jwt的时候存入的数据data
     if (err) return res.sendStatus(403); // 如果 token 无效或已过期，则返回 403 Forbidden
-    req.user = user; // 将解码后的用户信息附加到请求对象上
-    console.log(user);
+    console.log("jwt token解析数据", data);
+    const method = req.method;
+    if (method == "GET") {
+      req.query.openId = data.openId;
+    } else if (method == "POST") {
+      req.body.openId = data.openId;
+    }
     next();
   });
 }
@@ -53,14 +59,13 @@ app.use((req, res, next) => {
   const routeNeedsAuth = !publicRoutes.includes(req.path);
   console.log("请求路径", req.path);
   console.log("是否需要验证", routeNeedsAuth);
+  console.log("请求方式", req.method);
   console.log("请求头", req.headers);
   console.log("请求体", req.body);
   console.log("请求参数", req.query);
   // console.log("响应体", res.body);
-
   if (routeNeedsAuth) {
-    // authenticateToken(req, res, next);
-    next();
+    authenticateToken(req, res, next);
   } else {
     next();
   }

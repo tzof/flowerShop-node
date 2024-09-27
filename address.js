@@ -120,4 +120,21 @@ router.post("/setAddress", async (req, res) => {
     });
   });
 });
+
+// 删除地址
+router.post("/deleteAddress", async (req, res) => {
+  const reqData = req.body;
+  const { addressId } = reqData;
+  let mysql = `
+    DELETE FROM address WHERE addressId = ${Number(addressId)}
+  `;
+  await pool.query(mysql).then((data) => {
+    console.log(data);
+    res.json({
+      code: 200,
+      msg: "删除地址成功",
+    });
+  });
+});
+
 module.exports = router;
