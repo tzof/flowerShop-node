@@ -135,7 +135,7 @@ router.post("/deleteShoppingCart", (req, res) => {
 // 修改购物车选择状态
 router.post("/setShoppingCartSelect", async (req, res) => {
   const reqData = req.body;
-  const { carId, isSelect = false } = reqData;
+  const { carId, isSelect = 0 } = reqData;
   let mysql = `
     UPDATE shopping_cart SET isSelect = ${isSelect} WHERE carId = ${Number(
     carId
@@ -152,7 +152,7 @@ router.post("/setShoppingCartSelect", async (req, res) => {
 // 全选修改购物车选择状态
 router.post("/setShoppingCartAllSelect", async (req, res) => {
   const reqData = req.body;
-  const { openId, isSelect = false } = reqData;
+  const { openId, isSelect = 0 } = reqData;
   let mysql = `
     UPDATE shopping_cart SET isSelect = ${isSelect} WHERE openId = '${openId}';
   `;

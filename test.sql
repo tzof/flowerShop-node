@@ -13,6 +13,7 @@ CREATE TABLE `departments` (
   CONSTRAINT `departments_ibfk_1` FOREIGN KEY (`parent_department_id`) REFERENCES `departments` (`department_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+
 -- 主要功能就是根据层级添加了level层级字段。和返回原有departments表内所有的字段。
 -- 这段SQL使用了递归公用表表达式（Recursive Common Table Expression, CTE）来查询部门的层级结构
 -- WITH DepartmentHierarchy子句定义了一个临时结果集名字为DepartmentHierarchy，称为CTE。As前面的是cte名，后面的是查询语句
@@ -48,3 +49,41 @@ WITH RECURSIVE DepartmentHierarchy AS (
 -- 最后，从CTE DepartmentHierarchy 中选择所有列，得到完整的部门层级结构。
 SELECT * FROM DepartmentHierarchy;
 -- // 效果图 http://assets.tzof.net/flower/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240923162934.png
+
+
+BEGIN
+  IF NEW.original_price IS NOT NULL AND NEW.discount_rate IS NOT NULL THEN
+    SET NEW.discounted_price = NEW.original_price * NEW.discount_rate;
+  END IF;
+END
+
+CREATE DEFINER=`root`@`%` TRIGGER `update_compute_discounted_price` BEFORE UPDATE ON `goods` FOR EACH ROW BEGIN
+  IF NEW.original_price IS NOT NULL AND NEW.discount_rate IS NOT NULL THEN
+    SET NEW.discounted_price = NEW.original_price * NEW.discount_rate;
+  END IF;
+END;
+
+CREATE DEFINER=`root`@`%` TRIGGER `insert_compute_discounted_price` BEFORE INSERT ON `goods` FOR EACH ROW BEGIN
+  IF NEW.original_price IS NOT NULL AND NEW.discount_rate IS NOT NULL THEN
+    SET NEW.discounted_price = NEW.original_price * NEW.discount_rate;
+  END IF;
+END;
+
+
+BEGIN
+    -- 检查用户是否已经有默认地址
+    -- 声明一个变量来存储用户是否有默认地址的结果。
+    DECLARE has_default_address BOOLEAN;
+    -- 查询该用户是否已经有默认地址，并将结果存入变量。
+    -- SELECT EXISTS 是 SQL 中的一种查询方式，用于检查子查询是否返回任何行。
+    -- 如果子查询返回了一行或多行，EXISTS 返回 TRUE。
+    -- 如果子查询没有返回任何行，EXISTS 返回 FALSE。
+    -- INTO 关键字用于将 EXISTS 查询的结果存储到一个变量中。
+    -- 1 只是一个占位符，表示我们不关心具体的列内容，只关心是否存在匹配的行。
+    SELECT EXISTS (SELECT 1 FROM address WHERE openId = NEW.openId AND is_default = 1) INTO has_default_address;
+
+    -- 如果没有默认地址，则将新地址设为默认
+    IF NOT has_default_address THEN
+        SET NEW.is_default = 1;
+    END IF;
+END

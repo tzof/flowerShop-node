@@ -14,6 +14,7 @@ const goodsApi = require("./goods");
 const departmentsApi = require("./departments");
 const categoryApi = require("./category");
 const shoppingCartApi = require("./shoppingCart");
+const addressApi = require("./address");
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocs = require("./swagger"); // 引入你之前配置的swagger.js
@@ -55,6 +56,8 @@ app.use((req, res, next) => {
   console.log("请求头", req.headers);
   console.log("请求体", req.body);
   console.log("请求参数", req.query);
+  // console.log("响应体", res.body);
+
   if (routeNeedsAuth) {
     // authenticateToken(req, res, next);
     next();
@@ -63,14 +66,15 @@ app.use((req, res, next) => {
   }
 });
 
-app.use(ossApi);
-app.use(loginApi);
-app.use(userinfoApi);
-app.use(homeApi);
-app.use(goodsApi);
+app.use(ossApi); // 阿里oss
+app.use(loginApi); // 登录
+app.use(userinfoApi); // 用户
+app.use(homeApi); // 主页接口
+app.use(goodsApi); // 商品
 app.use(departmentsApi);
-app.use(categoryApi);
-app.use(shoppingCartApi);
+app.use(categoryApi); // 分类
+app.use(shoppingCartApi); // 购物车
+app.use(addressApi); // 地址
 
 // 配置SSL证书和密钥
 const options = {
