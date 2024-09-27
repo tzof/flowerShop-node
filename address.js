@@ -69,4 +69,38 @@ router.post("/addAddress", async (req, res) => {
   });
 });
 
+// 修改地址
+router.post("/setAddress", async (req, res) => {
+  const reqData = req.body;
+  reqData.is_default = Number(reqData.is_default);
+  const { openId, addressId, is_default } = reqData;
+  const dataArr = [
+    "recipients",
+    "phone",
+    "province",
+    "city",
+    "county",
+    "full_address",
+  ];
+  // 如果设置为默认地址将用户下其他地址is_default设置为0
+  if (is_default) {
+    await changeDefault(openId);
+  }
+  let mysqlStr = "";
+  dataArr.forEach((item) => {
+    mysqlStr += `${item} = '${reqData[item]}', `;
+  });
+  let mysql = `
+    UPDATE address SET ${mysqlStr} is_default = ${is_default} WHERE addressId = ${addressId}
+  `;
+  console.log(mysql);
+
+  await pool.query(mysql).then((data) => {
+    console.log(data);
+    res.json({
+      code: 200,
+      msg: "修改地址成功",
+    });
+  });
+});
 module.exports = router;
