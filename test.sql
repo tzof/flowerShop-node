@@ -72,7 +72,7 @@ END;
 
 BEGIN
     -- 检查用户是否已经有默认地址
-    -- 声明一个变量来存储用户是否有默认地址的结果。
+    -- DECLARE声明一个变量来存储用户是否有默认地址的结果。
     DECLARE has_default_address BOOLEAN;
     -- 查询该用户是否已经有默认地址，并将结果存入变量。
     -- SELECT EXISTS 是 SQL 中的一种查询方式，用于检查子查询是否返回任何行。
@@ -87,3 +87,51 @@ BEGIN
         SET NEW.is_default = 1;
     END IF;
 END
+
+BEGIN
+  DECLARE top_categories, sub_categories, random_top, random_sub VARCHAR(255);
+
+  -- GROUP_CONCAT 是 MySQL 中的一个聚合函数，用于将多行数据的某个字段值连接成一个单一的字符串。
+  -- (category_id)需要连接的字段
+  -- 获取没有parent_category_id的顶级分类ID列表
+  SELECT GROUP_CONCAT(category_id)
+  FROM category
+  WHERE parent_category_id IS NULL
+  INTO top_categories;
+
+  -- 获取有parent_category_id的子级分类ID列表
+  SELECT GROUP_CONCAT(category_id)
+  FROM category
+  WHERE parent_category_id IS NOT NULL
+  INTO sub_categories;
+
+  -- 从顶级分类中随机选取一个ID
+  SET random_top = SUBSTRING_INDEX(SUBSTRING_INDEX(top_categories, ',', FLOOR(1 + (RAND() * (LENGTH(top_categories) - LENGTH(REPLACE(top_categories, ',', ''))) / LENGTH(',')))), ',', -1);
+
+  -- 从子级分类中随机选取一个ID
+  SET random_sub = SUBSTRING_INDEX(SUBSTRING_INDEX(sub_categories, ',', FLOOR(1 + (RAND() * (LENGTH(sub_categories) - LENGTH(REPLACE(sub_categories, ',', ''))) / LENGTH(',')))), ',', -1);
+
+  -- CONCAT 函数用于将两个或多个字符串连接成一个单一的字符串。
+  -- 将两个随机ID用逗号连接
+  SET NEW.category_ids = CONCAT(random_top, ',', random_sub);
+END
+
+CREATE DEFINER=`root`@`%` TRIGGER `insert_category_ids` BEFORE INSERT ON `goods` FOR EACH ROW BEGIN
+  DECLARE top_categories, sub_categories, random_top, random_sub VARCHAR(255);
+
+  SELECT GROUP_CONCAT(category_id)
+  FROM category
+  WHERE parent_category_id IS NULL
+  INTO top_categories;
+
+  SELECT GROUP_CONCAT(category_id)
+  FROM category
+  WHERE parent_category_id IS NOT NULL
+  INTO sub_categories;
+
+  SET random_top = SUBSTRING_INDEX(SUBSTRING_INDEX(top_categories, ',', FLOOR(1 + (RAND() * (LENGTH(top_categories) - LENGTH(REPLACE(top_categories, ',', ''))) / LENGTH(',')))), ',', -1);
+
+  SET random_sub = SUBSTRING_INDEX(SUBSTRING_INDEX(sub_categories, ',', FLOOR(1 + (RAND() * (LENGTH(sub_categories) - LENGTH(REPLACE(sub_categories, ',', ''))) / LENGTH(',')))), ',', -1);
+
+  SET NEW.category_ids = CONCAT(random_top, ',', random_sub);
+END;

@@ -21,9 +21,11 @@ router.get("/getDefaultAddress", async (req, res) => {
 // 获取地址 默认地址降序返回 DESC升序 ASC降序(默认 可不填)
 router.get("/getAddress", async (req, res) => {
   const reqData = req.query;
-  const { openId } = reqData;
+  const { openId, addressId } = reqData;
   let mysql = `
-   SELECT * FROM address WHERE openId = '${openId}' ORDER BY is_default DESC
+   SELECT * FROM address WHERE openId = '${openId}' ${
+    addressId ? `AND addressId = ${addressId}` : ""
+  } ORDER BY is_default DESC
   `;
   await pool.query(mysql).then((data) => {
     console.log(data[0]);
@@ -35,6 +37,7 @@ router.get("/getAddress", async (req, res) => {
   });
 });
 
+// 设置默认地址的时候将用户下其他地址is_default设置为0
 async function changeDefault(openId) {
   let mysql = `
     UPDATE address SET is_default = 0 WHERE openId = '${openId}'
@@ -117,6 +120,30 @@ router.post("/setAddress", async (req, res) => {
     res.json({
       code: 200,
       msg: "修改地址成功",
+    });
+  });
+});
+
+// 修改默认地址选项
+router.post("/setDefaultAddress", async (req, res) => {
+  const reqData = req.body;
+  const { openId, addressId, is_default = 0 } = reqData;
+  let mysql = "";
+  if (is_default) {
+    await changeDefault(openId);
+    mysql = `
+      UPDATE address SET is_default = 1 WHERE addressId = ${Number(addressId)}
+    `;
+  } else {
+    mysql = `
+      UPDATE address SET is_default = 0 WHERE addressId = ${Number(addressId)}
+    `;
+  }
+  await pool.query(mysql).then((data) => {
+    console.log(data);
+    res.json({
+      code: 200,
+      msg: "修改默认地址成功",
     });
   });
 });
