@@ -5,7 +5,6 @@ const pool = require("./mysqlInfo");
 router.get("/getShoppingCartTotal", async (req, res) => {
   const reqData = req.query;
   const { openId } = reqData;
-  console.log(openId);
   let mysql = `
    SELECT COUNT(*) AS total FROM shopping_cart WHERE openId = '${openId}'
   `;
@@ -25,7 +24,7 @@ router.get("/getShoppingCart", async (req, res) => {
   const { openId } = reqData;
   console.log(reqData);
   let mysql = `
-    SELECT * FROM shopping_cart WHERE openId = '${openId}';
+    SELECT * FROM shopping_cart WHERE openId = '${openId}' ORDER BY createTime DESC;
   `;
   await pool.query(mysql).then((data) => {
     let promiseArr = [];

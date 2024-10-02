@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const pool = require("./mysqlInfo");
 
+// 获取商品列表
 router.get("/goods", async (req, res) => {
   const reqData = req.query;
   const { pageSize, pageNum, category_ids } = reqData;
@@ -38,6 +39,20 @@ router.get("/goods", async (req, res) => {
         data: data[0],
         total: totalData[0][0].total,
       });
+    });
+  });
+});
+
+// 获取商品详情信息
+router.get("/goodsDetail", async (req, res) => {
+  const reqData = req.query;
+  const { goodsId } = reqData;
+  const dataQuery = "SELECT * FROM goods WHERE goodsId = ?";
+  await pool.query(dataQuery, [goodsId]).then((data) => {
+    res.json({
+      code: 200,
+      data: data[0][0],
+      msg: "查询商品详情成功",
     });
   });
 });
