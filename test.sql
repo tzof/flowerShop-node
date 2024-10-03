@@ -57,13 +57,15 @@ BEGIN
   END IF;
 END
 
-CREATE DEFINER=`root`@`%` TRIGGER `update_compute_discounted_price` BEFORE UPDATE ON `goods` FOR EACH ROW BEGIN
+CREATE DEFINER=`root`@`%` TRIGGER `update_compute_discounted_price` BEFORE UPDATE ON `goods` FOR EACH ROW 
+BEGIN
   IF NEW.original_price IS NOT NULL AND NEW.discount_rate IS NOT NULL THEN
     SET NEW.discounted_price = NEW.original_price * NEW.discount_rate;
   END IF;
 END;
 
-CREATE DEFINER=`root`@`%` TRIGGER `insert_compute_discounted_price` BEFORE INSERT ON `goods` FOR EACH ROW BEGIN
+CREATE DEFINER=`root`@`%` TRIGGER `insert_compute_discounted_price` BEFORE INSERT ON `goods` FOR EACH ROW 
+BEGIN
   IF NEW.original_price IS NOT NULL AND NEW.discount_rate IS NOT NULL THEN
     SET NEW.discounted_price = NEW.original_price * NEW.discount_rate;
   END IF;

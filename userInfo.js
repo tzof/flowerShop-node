@@ -64,7 +64,7 @@ router.post("/getUserinfo", async (req, res) => {
     console.log(req.body, data, "获取用户信息成功", resData);
     const avatarUrl = (
       resData && (await generateSignedUrl(resData.avatarfileName))
-    ).replace(
+    )?.replace(
       "http://tzof-oss.oss-cn-hangzhou.aliyuncs.com",
       "https://oss.tzof.net"
     );

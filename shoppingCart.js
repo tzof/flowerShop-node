@@ -28,8 +28,8 @@ router.get("/getShoppingCart", async (req, res) => {
   `;
   await pool.query(mysql).then((data) => {
     let promiseArr = [];
-    data[0].forEach(async (item) => {
-      let promiseItem = new Promise(async (resolve, reject) => {
+    data[0].forEach((item) => {
+      const promiseItem = new Promise(async (resolve, reject) => {
         let goodsId = item.goodsId;
         // 查询商品信息并存入返回数据
         mysql = `
