@@ -16,7 +16,13 @@ async function uploadFileToOSS(file) {
     let name = originalname.substring(0, index);
     let typeName = originalname.substring(index + 1);
     let pathName = process.env.OSS_PATH; // 存储路径。不加存储路径默认就是根目录
-    fileName = pathName + "/" + name + "-" + new Date().getTime() + "." + typeName;
+    fileName =
+      (pathName ? pathName + "/" : "") +
+      name +
+      "-" +
+      new Date().getTime() +
+      "." +
+      typeName;
     await client.put(fileName, file.buffer);
     console.log(file);
     return `https://oss.tzof.net/${fileName}`;
