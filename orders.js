@@ -119,4 +119,33 @@ router.post("/addOrders", async (req, res) => {
   });
 });
 
+// 获取订单
+router.get("/getOrders", async (req, res) => {
+  const { openId } = req.query;
+  let mysql = `
+    SELECT * FROM orders WHERE openId = '${openId}' ORDER BY createTime DESC
+  `;
+  await pool.query(mysql).then(async (data) => {
+    let resData = data[0];
+    const promiseArr = [];
+    resData.forEach((item) => {
+      const promiseItem = new Promise(async (resolve, reject) => {
+        let mysql = `
+          SELECT * FROM orders_item WHERE ordersId = ${item.ordersId}
+        `;
+        await pool.query(mysql).then((data) => {
+          item.goodsList = data[0];
+        });
+        resolve();
+      });
+      promiseArr.push(promiseItem);
+    });
+    await Promise.all(promiseArr);
+    res.send({
+      code: 200,
+      msg: "查询订单表和订单子表成功",
+      data: resData,
+    });
+  });
+});
 module.exports = router;
