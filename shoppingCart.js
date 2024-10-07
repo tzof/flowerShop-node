@@ -39,7 +39,7 @@ router.get("/getShoppingCart", async (req, res) => {
           .query(mysql)
           .then((data) => {
             item.goodsInfo = data[0][0];
-            item.totalPrices = item.goodsInfo.discounted_price * item.count;
+            item.totalPrice = item.goodsInfo.discounted_price * item.count;
           })
           .catch((err) => {
             console.log("error:查找购物车商品详情出错", err);

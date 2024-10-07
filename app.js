@@ -66,8 +66,8 @@ app.use((req, res, next) => {
   console.log("请求参数", req.query);
   // console.log("响应体", res.body);
   if (routeNeedsAuth) {
-    // authenticateToken(req, res, next);
-    next();
+    authenticateToken(req, res, next);
+    // next();
   } else {
     next();
   }
