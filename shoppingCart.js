@@ -83,22 +83,24 @@ router.post("/setShoppingCart", async (req, res) => {
   await pool
     .query(mysql)
     .then(async (data) => {
-      console.log(data[0]);
       let isNewShopCar = false;
       // 没有则创建购物车
       if (data[0].length === 0) {
         isNewShopCar = true;
+        // 如果有传count则修改数量 没有则为1
+        count = count ? count : 1;
         mysql = `
         INSERT INTO shopping_cart (openId, goodsId, count) VALUES ('${openId}', ${goodsId}, ${count});
       `;
       }
       // 已在购物车商品修改
       else {
+        // 如果有传count则修改数量 没有则自增
+        count = count ? count : data[0][0].count + 1;
         mysql = `
         UPDATE shopping_cart SET count = ${count} WHERE openId = '${openId}' AND goodsId = ${goodsId};
       `;
       }
-      console.log(mysql);
       await pool
         .query(mysql)
         .then((data) => {
@@ -127,6 +129,22 @@ router.post("/deleteShoppingCart", (req, res) => {
     res.json({
       code: 200,
       msg: "删除购物车成功",
+    });
+  });
+});
+
+// 购物车点击结算下单成功后减少购物车内商品数量
+router.post("/setShoppingCartCount", async (req, res) => {
+  const reqData = req.body;
+  const { goodsId, count } = reqData;
+  let mysql = `
+    UPDATE shopping_cart SET count = ${count} WHERE goodsId = ${Number(
+    goodsId
+  )};
+  `;
+  await pool.query(mysql).then((data) => {
+    res.json({
+      code: 200,
     });
   });
 });
