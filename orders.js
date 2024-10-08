@@ -170,9 +170,34 @@ router.post("/addOrders", async (req, res) => {
 // 获取订单
 router.get("/getOrders", async (req, res) => {
   const { openId } = req.query;
-  let mysql = `
-    SELECT * FROM orders WHERE openId = '${openId}' ORDER BY createTime DESC
+  let { status, pageSize, pageNum } = req.query;
+  pageSize = Number(pageSize) || 10;
+  pageNum = Number(pageNum) || 1;
+  // OFFSET计算公式 = (页码 - 1) * 每页显示的记录数
+  const offset = Number(pageNum - 1) * pageSize || 0;
+  let mysqlTotal = `
+    SELECT COUNT(*) AS total FROM orders WHERE openId = '${openId}'
   `;
+  let mysql = `
+    SELECT * FROM orders WHERE openId = '${openId}'
+  `;
+  const orderAndLimit = ` ORDER BY createTime DESC LIMIT ${pageSize} OFFSET ${offset}`;
+  let whereAnd = "";
+  // 如果有传状态则按状态查询
+  if (status) {
+    status = Number(status);
+    // orders_status 订单状态 0.已经创建 1.已支付 2.商家确定 3.已经发货 4.已收货 5.交易完成
+    if (status == 3) {
+      whereAnd = ` AND (orders_status = 3 OR orders_status = 2 OR orders_status = 1)`;
+    } else if (status == 5) {
+      whereAnd = ` AND (orders_status = 5 OR orders_status = 4)`;
+    } else {
+      whereAnd = ` AND orders_status = ${status}`;
+    }
+  }
+  mysqlTotal += whereAnd;
+  mysql += whereAnd + orderAndLimit;
+  const total = (await pool.query(mysqlTotal))[0][0].total;
   await pool.query(mysql).then(async (data) => {
     let resData = data[0];
     const promiseArr = [];
@@ -193,6 +218,7 @@ router.get("/getOrders", async (req, res) => {
       code: 200,
       msg: "查询订单表和订单子表成功",
       data: resData,
+      total,
     });
   });
 });
