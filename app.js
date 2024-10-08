@@ -43,7 +43,7 @@ function authenticateToken(req, res, next) {
   jwt.verify(token, process.env.JWT_SECRET_KEY, (err, data) => {
     // data中存的是jwt.sign(data,key,time)创建jwt的时候存入的数据data
     if (err) return res.sendStatus(403); // 如果 token 无效或已过期，则返回 403 Forbidden
-    console.log("jwt token解析数据", data);
+    // console.log("jwt token解析数据", data);
     const method = req.method;
     if (method == "GET") {
       req.query.openId = data.openId;

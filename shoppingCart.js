@@ -90,7 +90,7 @@ router.post("/setShoppingCart", async (req, res) => {
         // 如果有传count则修改数量 没有则为1
         count = count ? count : 1;
         mysql = `
-        INSERT INTO shopping_cart (openId, goodsId, count) VALUES ('${openId}', ${goodsId}, ${count});
+        INSERT INTO shopping_cart (openId, goodsId, count, isSelect) VALUES ('${openId}', ${goodsId}, ${count}, 1);
       `;
       }
       // 已在购物车商品修改
@@ -98,7 +98,7 @@ router.post("/setShoppingCart", async (req, res) => {
         // 如果有传count则修改数量 没有则自增
         count = count ? count : data[0][0].count + 1;
         mysql = `
-        UPDATE shopping_cart SET count = ${count} WHERE openId = '${openId}' AND goodsId = ${goodsId};
+        UPDATE shopping_cart SET count = ${count}, isSelect = 1 WHERE openId = '${openId}' AND goodsId = ${goodsId};
       `;
       }
       await pool
@@ -133,20 +133,68 @@ router.post("/deleteShoppingCart", (req, res) => {
   });
 });
 
-// 购物车点击结算下单成功后减少购物车内商品数量
-router.post("/setShoppingCartCount", async (req, res) => {
+// 购物车结算下单成功后减少购物车内商品数量
+router.post("/setMinusShoppingCartCount", async (req, res) => {
   const reqData = req.body;
-  const { goodsId, count } = reqData;
-  let mysql = `
-    UPDATE shopping_cart SET count = ${count} WHERE goodsId = ${Number(
-    goodsId
-  )};
-  `;
-  await pool.query(mysql).then((data) => {
-    res.json({
-      code: 200,
-    });
+  const { openId, changeCartsList } = reqData;
+  // 获取连接
+  const connection = await pool.getConnection().catch((err) => {
+    throw err;
   });
+  // 开始事务 只有connection链接下的原型链才包含beginTransaction pool连接池无法直接调用
+  await connection.beginTransaction().catch((err) => {
+    connection.release();
+    throw err;
+  });
+  try {
+    let promiseArr = [];
+    changeCartsList.forEach(async (item) => {
+      const promiseItem = new Promise(async (resolve, reject) => {
+        const { goodsId, count } = item;
+        // 查询购物车当前商品的数量
+        let mysql = `
+          SELECT count FROM shopping_cart WHERE openId = '${openId}' AND goodsId = ${goodsId};
+        `;
+        const dataCount = (await pool.query(mysql))[0][0].count;
+        const newCount = dataCount - count;
+        // 减去后的数量小于等于0则删除
+        if (newCount === 0 || newCount < 0) {
+          mysql = `
+            DELETE FROM shopping_cart WHERE openId = '${openId}' AND goodsId = ${goodsId};
+          `;
+        }
+        // 修改减去后的数量
+        else {
+          mysql = `
+            UPDATE shopping_cart SET count = ${newCount} WHERE openId = '${openId}' AND goodsId = ${goodsId};
+          `;
+        }
+        await pool.query(mysql).catch((err) => {
+          reject(err);
+        });
+        console.log(
+          "购物车商品：" + item.goodsId + "数量修改成功：" + newCount
+        );
+        resolve();
+      });
+      promiseArr.push(promiseItem);
+    });
+    await Promise.all(promiseArr);
+    // 提交事务
+    await connection.commit().then(() => {
+      res.json({
+        code: 200,
+        msg: "购物车商品数量修改成功",
+      });
+    });
+  } catch (err) {
+    console.log(err);
+    // 回滚当前的事务
+    await connection.rollback();
+  } finally {
+    // 释放连接 将连接返回到连接池
+    await connection.release();
+  }
 });
 
 // 修改购物车选择状态
