@@ -139,10 +139,12 @@ router.post("/setMinusShoppingCartCount", async (req, res) => {
   const { openId, changeCartsList } = reqData;
   // 获取连接
   const connection = await pool.getConnection().catch((err) => {
+    console.log(err);
     throw err;
   });
-  // 开始事务 只有connection链接下的原型链才包含beginTransaction pool连接池无法直接调用
+  // 开始事务 只有connection连接下的原型链才包含beginTransaction pool连接池无法直接调用
   await connection.beginTransaction().catch((err) => {
+    console.log(err);
     connection.release();
     throw err;
   });
@@ -169,9 +171,7 @@ router.post("/setMinusShoppingCartCount", async (req, res) => {
             UPDATE shopping_cart SET count = ${newCount} WHERE openId = '${openId}' AND goodsId = ${goodsId};
           `;
         }
-        await pool.query(mysql).catch((err) => {
-          reject(err);
-        });
+        await pool.query(mysql)
         console.log(
           "购物车商品：" + item.goodsId + "数量修改成功：" + newCount
         );
