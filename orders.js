@@ -186,6 +186,9 @@ router.get("/getOrders", async (req, res) => {
   // 如果有传状态则按状态查询
   if (status) {
     status = Number(status);
+    if (!status) {
+      return;
+    }
     // orders_status 订单状态 0.已经创建 1.已支付 2.商家确定 3.已经发货 4.已收货 5.交易完成
     if (status == 3) {
       whereAnd = ` AND (orders_status = 3 OR orders_status = 2 OR orders_status = 1)`;
@@ -241,6 +244,39 @@ router.get("/getOrdersDetail", async (req, res) => {
       code: 200,
       msg: "查询订单详情成功",
       data: resData,
+    });
+  });
+});
+
+// 查询不同状态的订单总数
+router.get("/getOrdersTotal", async (req, res) => {
+  const { openId } = req.query;
+  let { status } = req.query;
+  let mysql = `
+    SELECT COUNT(*) AS total FROM orders WHERE openId = '${openId}'
+  `;
+  let whereAnd = "";
+  // 如果有传状态则按状态查询
+  if (status) {
+    status = Number(status);
+    if (!status) {
+      return;
+    }
+    // orders_status 订单状态 0.已经创建 1.已支付 2.商家确定 3.已经发货 4.已收货 5.交易完成
+    if (status == 3) {
+      whereAnd = ` AND (orders_status = 3 OR orders_status = 2 OR orders_status = 1)`;
+    } else if (status == 5) {
+      whereAnd = ` AND (orders_status = 5 OR orders_status = 4)`;
+    } else {
+      whereAnd = ` AND orders_status = ${status}`;
+    }
+  }
+  mysql += whereAnd;
+  await pool.query(mysql).then((data) => {
+    res.send({
+      code: 200,
+      msg: "查询订单总数成功",
+      data: data[0][0].total,
     });
   });
 });
