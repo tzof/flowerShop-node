@@ -2,6 +2,95 @@ const router = require("express").Router();
 const pool = require("./mysqlInfo");
 
 // 新建订单
+/**
+ * @swagger
+ * /addOrders:
+ *   post:
+ *     summary: 新建订单
+ *     tags: [Orders]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: ["address","recipients","phone","province","city","county","full_address","orders_name","orders_phone","deliveryTime","orders_notes","totalPrice","goodsList"]
+ *             properties:
+ *               address:
+ *                 type: string
+ *                 default: "收货地址合集 收件人+电话号码+省+市+区县+详细地址"
+ *                 description: 收货地址合集 收件人+电话号码+省+市+区县+详细地址
+ *               recipients:
+ *                 type: string
+ *                 default: "收货地址-收件人"
+ *                 description: 收货地址-收件人
+ *               phone:
+ *                 type: string
+ *                 default: "收货地址-电话号码"
+ *                 description: 收货地址-电话号码
+ *               province:
+ *                 type: string
+ *                 default: "收货地址-省"
+ *                 description: 收货地址-省
+ *               city:
+ *                 type: string
+ *                 default: "收货地址-市"
+ *                 description: 收货地址-市
+ *               county:
+ *                 type: string
+ *                 default: "收货地址-区县"
+ *                 description: 收货地址-区县
+ *               full_address:
+ *                 type: string
+ *                 default: "收货地址-详细地址"
+ *                 description: 收货地址-详细地址
+ *               orders_name:
+ *                 type: string
+ *                 default: "订购人姓名"
+ *                 description: 订购人姓名
+ *               orders_phone:
+ *                 type: string
+ *                 default: "订购人手机号"
+ *                 description: 订购人手机号
+ *               deliveryTime:
+ *                 type: string
+ *                 default: "期望送达时间"
+ *                 description: 期望送达时间
+ *               orders_notes:
+ *                 type: string
+ *                 default: "订单备注"
+ *                 description: 订单备注
+ *               totalPrice:
+ *                 type: string
+ *                 default: "总价 "
+ *                 description: 总价            
+ *               goodsList:
+ *                 type: array
+ *                 default: "待下单的商品数组，如：[{goodsId: 1, count: 2},{goodsId: 2, count: 8}] 数组形式每个元素都是一个对象存放商品goodsId和数量count"
+ *                 description: "待下单的商品数组，如：[{goodsId: 1, count: 2},{goodsId: 2, count: 8}] 数组形式每个元素都是一个对象存放商品goodsId和数量count" 
+ *     responses:
+ *       200:
+ *         description: 成功新建订单
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   default: 新建订单成功
+ *       500:
+ *         description: 创建订单失败
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   default: 创建订单失败
+ */
 router.post("/addOrders", async (req, res) => {
   const reqData = req.body;
   // 需要查询和存入sql的字段
@@ -178,7 +267,45 @@ router.post("/addOrders", async (req, res) => {
   }
 });
 
-// 获取订单
+// 获取订单列表
+/**
+ * @swagger
+ * /getOrders:
+ *   get:
+ *     summary: 获取订单列表
+ *     tags: [Orders]
+ *     security:
+ *       - jwtAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: pageNum
+ *         required: true
+ *         description: 第几页
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: pageSize
+ *         required: true
+ *         description: 每页多少条数据
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: status
+ *         description: 订单状态，不传则表示查询所有订单，0.已经创建 1.已支付 2.商家确定 3.已经发货 4.已收货 5.交易完成
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: 成功获取订单列表
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   defautl: 获取订单列表成功
+ */
 router.get("/getOrders", async (req, res) => {
   const { openId } = req.query;
   let { status, pageSize, pageNum } = req.query;
@@ -244,6 +371,33 @@ router.get("/getOrders", async (req, res) => {
 });
 
 // 获取订单详情
+/**
+ * @swagger
+ * /getOrdersDetail:
+ *   get:
+ *     summary: 获取订单详情
+ *     tags: [Orders]
+ *     security:
+ *       - jwtAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: ordersId
+ *         required: true
+ *         description: 订单id
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: 成功获取订单详情
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   defautl: 获取订单详情成功
+ */
 router.get("/getOrdersDetail", async (req, res) => {
   const { ordersId } = req.query;
   let mysql = `
@@ -266,6 +420,32 @@ router.get("/getOrdersDetail", async (req, res) => {
 });
 
 // 查询不同状态的订单总数
+/**
+ * @swagger
+ * /getOrdersTotal:
+ *   get:
+ *     summary: 查询订单总数
+ *     tags: [Orders]
+ *     security:
+ *       - jwtAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         description: 订单状态，不传则表示查询所有订单状态，0.已经创建 1.已支付 2.商家确定 3.已经发货 4.已收货 5.交易完成
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: 成功查询订单总数
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   defautl: 查询订单总数成功
+ */
 router.get("/getOrdersTotal", async (req, res) => {
   const { openId } = req.query;
   let { status } = req.query;
@@ -294,4 +474,5 @@ router.get("/getOrdersTotal", async (req, res) => {
     });
   });
 });
+
 module.exports = router;

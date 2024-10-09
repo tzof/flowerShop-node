@@ -38,11 +38,23 @@ app.use(bodyParser.urlencoded({ extended: false }));
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1]; // 解析Bearer JWT格式的token
-  if (token == null) return res.sendStatus(401); // 如果没有提供 token，则返回 401 Unauthorized
+  // 如果没有提供 token，则返回 403 Forbidden禁止进入的
+  if (token == null) {
+    return res.json({
+      code: 403,
+      msg: "token未提供",
+    });
+  }
   // verify()验证JWT的合法性和完整性 第一个参数要解析的token 第二个参数是密钥 第三个参数是回调函数(err,user)
   jwt.verify(token, process.env.JWT_SECRET_KEY, (err, data) => {
     // data中存的是jwt.sign(data,key,time)创建jwt的时候存入的数据data
-    if (err) return res.sendStatus(403); // 如果 token 无效或已过期，则返回 403 Forbidden
+    // 如果 token 无效或已过期，则返回 403 Forbidden禁止进入的
+    if (err) {
+      return res.json({
+        code: 403,
+        msg: "token失效或过期",
+      });
+    }
     // console.log("jwt token解析数据", data);
     const method = req.method;
     if (method == "GET") {

@@ -1,6 +1,33 @@
 const router = require("express").Router();
 const pool = require("./mysqlInfo");
 
+// 获取层级分类
+/**
+ * @swagger
+ * /category:
+ *   get:
+ *     summary: 获取层级分类
+ *     tags: [Category]
+ *     security:
+ *       - jwtAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         description: 分类id，不传就返回所有第一层的类别，可以根据第一层类别的id查询对应的子类别。只有两层。
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: 成功获取层级分类
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   defautl: 获取层级分类成功
+ */
 router.get("/category", async (req, res) => {
   const reqData = req.query;
   const category_id = reqData.id;
@@ -29,7 +56,7 @@ router.get("/category", async (req, res) => {
       console.log(reqData.id);
       res.json({
         code: 200,
-        msg: "获取大类分类成功",
+        msg: "获取分类成功",
         data: resData,
       });
     });

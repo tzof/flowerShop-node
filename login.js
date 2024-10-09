@@ -8,21 +8,22 @@ const jwt = require("jsonwebtoken");
  * @swagger
  * /login:
  *   post:
- *     summary: 微信小程序登录
+ *     summary: 微信小程序登录获取token
  *     tags: [Login]
  *     requestBody:
  *       content:
- *         application/json:
+ *         application/x-www-form-urlencoded:
  *           schema:
  *             type: object
  *             required: ["code"]
  *             properties:
  *               code:
  *                 type: string
- *                 description: 微信的临时登录凭证
+ *                 default: ""
+ *                 description: "微信的临时登录凭证"
  *     responses:
  *       200:
- *         description: 成功获取用户信息
+ *         description: 成功获取token
  *         content:
  *           application/json:
  *             schema:

@@ -1,7 +1,27 @@
 const router = require("express").Router();
 const pool = require("./mysqlInfo");
 
-// 获取购物车总数
+// 查询购物车总数
+/**
+ * @swagger
+ * /getShoppingCartTotal:
+ *   get:
+ *     summary: 查询购物车总数
+ *     tags: [Cart]
+ *     security:
+ *       - jwtAuth: []
+ *     responses:
+ *       200:
+ *         description: 成功查询购物车总数
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   defautl: 查询购物车总数成功
+ */
 router.get("/getShoppingCartTotal", async (req, res) => {
   const reqData = req.query;
   const { openId } = reqData;
@@ -18,7 +38,27 @@ router.get("/getShoppingCartTotal", async (req, res) => {
   });
 });
 
-// 获取购物车
+// 获取购物车列表
+/**
+ * @swagger
+ * /getShoppingCart:
+ *   get:
+ *     summary: 获取购物车列表
+ *     tags: [Cart]
+ *     security:
+ *       - jwtAuth: []
+ *     responses:
+ *       200:
+ *         description: 成功获取购物车列表
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   defautl: 获取购物车列表成功
+ */
 router.get("/getShoppingCart", async (req, res) => {
   const reqData = req.query;
   const { openId } = reqData;
@@ -88,7 +128,140 @@ router.get("/getShoppingCart", async (req, res) => {
   }
 });
 
-// 添加修改购物车
+// 修改购物车选择状态
+/**
+ * @swagger
+ * /setShoppingCartSelect:
+ *   post:
+ *     summary: 修改购物车选择状态
+ *     tags: [Cart]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             required: ["carId","isSelect"]
+ *             properties:
+ *               carId:
+ *                 type: string
+ *                 default: ""
+ *                 description: 购物车id
+ *               isSelect:
+ *                 type: string
+ *                 default: ""
+ *                 description: 是否选中，0 未选中，1 选中
+ *     responses:
+ *       200:
+ *         description: 成功修改购物车选择状态
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   default: 修改购物车选择状态成功
+ */
+router.post("/setShoppingCartSelect", async (req, res) => {
+  const reqData = req.body;
+  const { carId, isSelect = 0 } = reqData;
+  let mysql = `
+    UPDATE shopping_cart SET isSelect = ${isSelect} WHERE carId = ${Number(
+    carId
+  )};
+  `;
+  await pool.query(mysql).then((data) => {
+    res.json({
+      code: 200,
+      msg: "修改购物车选择状态成功",
+    });
+  });
+});
+
+// 全选修改购物车选择状态
+/**
+ * @swagger
+ * /setShoppingCartAllSelect:
+ *   post:
+ *     summary: 全选修改购物车选择状态
+ *     tags: [Cart]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             required: ["isSelect"]
+ *             properties:
+ *               isSelect:
+ *                 type: string
+ *                 default: ""
+ *                 description: 是否全选中，0 未选中，1 选中
+ *     responses:
+ *       200:
+ *         description: 成功全选修改购物车选择状态
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   default: 全选修改购物车选择状态成功
+ */
+router.post("/setShoppingCartAllSelect", async (req, res) => {
+  const reqData = req.body;
+  const { openId, isSelect = 0 } = reqData;
+  let mysql = `
+    UPDATE shopping_cart SET isSelect = ${isSelect} WHERE openId = '${openId}';
+  `;
+  await pool.query(mysql).then((data) => {
+    res.json({
+      code: 200,
+      msg: "修改全选购物车选择状态成功",
+    });
+  });
+});
+
+// 添加/修改购物车
+/**
+ * @swagger
+ * /setShoppingCart:
+ *   post:
+ *     summary: 添加/修改购物车
+ *     tags: [Cart]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             required: ["goodsId"]
+ *             properties:
+ *               goodsId:
+ *                 type: string
+ *                 default: ""
+ *                 description: 商品id
+ *               count:
+ *                 type: string
+ *                 default: ""
+ *                 description: 数量，没在购物车中商品不传数量则默认为1，已在购物车中商品不传数量则默认自增1
+ *     responses:
+ *       200:
+ *         description: 成功添加/修改购物车
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   default: 添加/修改购物车成功
+ */
 router.post("/setShoppingCart", async (req, res) => {
   const reqData = req.body;
   let { openId, goodsId, count } = reqData;
@@ -149,6 +322,37 @@ router.post("/setShoppingCart", async (req, res) => {
 });
 
 // 删除购物车
+/**
+ * @swagger
+ * /deleteShoppingCart:
+ *   post:
+ *     summary: 删除购物车
+ *     tags: [Cart]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             required: ["carId"]
+ *             properties:
+ *               carId:
+ *                 type: string
+ *                 default: ""
+ *                 description: 购物车id
+ *     responses:
+ *       200:
+ *         description: 成功删除购物车
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   default: 删除购物车成功
+ */
 router.post("/deleteShoppingCart", (req, res) => {
   const reqData = req.body;
   const { carId } = reqData;
@@ -163,7 +367,38 @@ router.post("/deleteShoppingCart", (req, res) => {
   });
 });
 
-// 购物车结算下单成功后减少购物车内商品数量
+// 减去购物车内商品的数量
+/**
+ * @swagger
+ * /setMinusShoppingCartCount:
+ *   post:
+ *     summary: 减去购物车内商品的数量
+ *     tags: [Cart]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: ["changeCartsList"]
+ *             properties:
+ *               changeCartsList:
+ *                 type: array
+ *                 default: "已下单完成的商品数组，如：[{goodsId: 1, count: 2},{goodsId: 2, count: 8}] 数组形式每个元素都是一个对象存放已下单完成商品goodsId和数量count"
+ *                 description: "已下单完成的商品数组，如：[{goodsId: 1, count: 2},{goodsId: 2, count: 8}] 数组形式每个元素都是一个对象存放已下单完成商品goodsId和数量count"
+ *     responses:
+ *       200:
+ *         description: 成功减去购物车内商品的数量
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   default: 减去购物车内商品的数量成功
+ */
 router.post("/setMinusShoppingCartCount", async (req, res) => {
   const reqData = req.body;
   const { openId, changeCartsList } = reqData;
@@ -235,38 +470,6 @@ router.post("/setMinusShoppingCartCount", async (req, res) => {
     // 释放连接 将连接返回到连接池
     await connection.release();
   }
-});
-
-// 修改购物车选择状态
-router.post("/setShoppingCartSelect", async (req, res) => {
-  const reqData = req.body;
-  const { carId, isSelect = 0 } = reqData;
-  let mysql = `
-    UPDATE shopping_cart SET isSelect = ${isSelect} WHERE carId = ${Number(
-    carId
-  )};
-  `;
-  await pool.query(mysql).then((data) => {
-    res.json({
-      code: 200,
-      msg: "修改购物车选择状态成功",
-    });
-  });
-});
-
-// 全选修改购物车选择状态
-router.post("/setShoppingCartAllSelect", async (req, res) => {
-  const reqData = req.body;
-  const { openId, isSelect = 0 } = reqData;
-  let mysql = `
-    UPDATE shopping_cart SET isSelect = ${isSelect} WHERE openId = '${openId}';
-  `;
-  await pool.query(mysql).then((data) => {
-    res.json({
-      code: 200,
-      msg: "修改全选购物车选择状态成功",
-    });
-  });
 });
 
 module.exports = router;

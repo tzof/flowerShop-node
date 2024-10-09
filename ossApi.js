@@ -68,7 +68,7 @@ async function generateSignedUrl() {
  * @swagger
  * /upload:
  *   post:
- *     summary: 上传文件到OSS并返回可访问地址
+ *     summary: 上传文件到OSS并返回可访问地址和文件名
  *     tags: [OSS]
  *     security:
  *       - jwtAuth: []

@@ -18,26 +18,22 @@ async function generateSignedUrl(fileName) {
     );
   }
 }
+
+//  *     parameters:
+//  *       - in: query
+//  *         name: openId
+//  *         required: true
+//  *         schema:
+//  *           type: string
 /**
  * 获取用户信息
  * @swagger
  * /getUserinfo:
- *   post:
- *     summary: 根据openId获取用户信息
+ *   get:
+ *     summary: 获取用户信息
  *     tags: [User]
  *     security:
  *       - jwtAuth: []
- *     requestBody:
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
- *             type: object
- *             required: ["openId"]
- *             properties:
- *               openId:
- *                 type: string
- *                 default: ""
- *                 description: 用户的openId
  *     responses:
  *       200:
  *         description: 成功获取用户信息
@@ -56,8 +52,8 @@ async function generateSignedUrl(fileName) {
  *                   type: string
  */
 // 获取用户信息
-router.post("/getUserinfo", async (req, res) => {
-  const openId = req.body.openId;
+router.get("/getUserinfo", async (req, res) => {
+  const { openId } = req.query;
   const mysql = `SELECT * FROM user WHERE openId = ?`;
   await pool.query(mysql, [openId]).then(async (data) => {
     let resData = data[0][0];
@@ -77,9 +73,8 @@ router.post("/getUserinfo", async (req, res) => {
   });
 });
 
-// post方法 传递json或者form-data数据
 /**
- * 获取用户信息
+ * 设置用户信息
  * @swagger
  * /setUserinfo:
  *   post:
@@ -92,20 +87,16 @@ router.post("/getUserinfo", async (req, res) => {
  *         application/x-www-form-urlencoded:
  *           schema:
  *             type: object
- *             required: ["openId"]
+ *             required: ["avatarfileName","avatarUrl","nickname"]
  *             properties:
- *               openId:
- *                 type: string
- *                 default: ""
- *                 description: 用户的openId
  *               avatarfileName:
  *                 type: string
  *                 default: ""
- *                 description: 头像文件名
+ *                 description: oss接口返回的头像文件名
  *               avatarUrl:
  *                 type: string
  *                 default: ""
- *                 description: 头像地址
+ *                 description: oss接口返回的头像地址
  *               nickname:
  *                 type: string
  *                 default: ""

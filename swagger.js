@@ -4,10 +4,10 @@ const options = {
   definition: {
     openapi: "3.1.0",
     info: {
-      title: "花城api文档",
+      title: "TZOF花城api文档",
       version: "1.0.0",
       description:
-        "nodejs+express+mysql+swagger+aliyunoss实现花城小程序后台api文档",
+        "nodejs+express+mysql2+swagger+aliyunOssSDK实现花城小程序后台api文档",
     },
     
     components: { // 全局自定义组件
@@ -55,18 +55,20 @@ module.exports = specs;
  *       - in: query // 指定参数位置 get请求的query传参
  *         name: openId // 参数名称
  *         required: true // 是否必填
+ *         description: 用户openid // 描述 注意是写在schema同层
  *         schema: // 开始定义内容
  *           type: string // 数据类型 
  *       - in: header // 指定参数位置 设置请求头
  *         name: X-Custom-Header // 请求头的名称
  *         required: true // 是否必填
+ *         description: 请求头 // 描述 注意是写在schema同层
  *         schema: // 开始定义内容
  *           type: string // 数据类型
- *     requestBody: // 定义请求体,req.body(request body)的信息。 传递json、form-data、x-www-form-urlencoded数据的时候使用
+ *     requestBody: // 定义请求体,req.body(request body)的信息。 传递application/json、multipart/form-data、application/x-www-form-urlencoded数据的时候使用
  *       required: true // 是否必填。对于整个请求体不是指定某个字段。
  *       description: 需要的请求体 // 对于整个请求体的描述。
  *       content: // 开始定义请求体内容
- *         application/json: // 指定了请求体内容格式为json，可以为json、multipart/form-data、application/x-www-form-urlencoded等请求体的格式
+ *         application/json: // 指定了请求体内容格式为json，可以为application/json、multipart/form-data、application/x-www-form-urlencoded等请求体的格式
  *           schema: // 开始定义内容
  *             type: object // 内容的数据类型
  *             required: ["openId"] // 指定对象内的必填字段

@@ -2,6 +2,26 @@ const router = require("express").Router();
 const pool = require("./mysqlInfo");
 
 // 获取默认地址
+/**
+ * @swagger
+ * /getDefaultAddress:
+ *   get:
+ *     summary: 获取默认地址
+ *     tags: [Address]
+ *     security:
+ *       - jwtAuth: []
+ *     responses:
+ *       200:
+ *         description: 成功获取默认地址
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   defautl: 获取默认地址成功
+ */
 router.get("/getDefaultAddress", async (req, res) => {
   const reqData = req.query;
   const { openId } = reqData;
@@ -18,14 +38,40 @@ router.get("/getDefaultAddress", async (req, res) => {
   });
 });
 
-// 获取地址 默认地址降序返回 DESC升序 ASC降序(默认 可不填)
+// 获取地址列表 默认地址降序返回 DESC升序 ASC降序(默认 可不填)
+/**
+ * @swagger
+ * /getAddress:
+ *   get:
+ *     summary: 获取地址列表
+ *     tags: [Address]
+ *     security:
+ *       - jwtAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: addressId
+ *         description: 地址id，不传查当前用户所有地址
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: 成功获取地址列表
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   defautl: 获取地址列表成功
+ */
 router.get("/getAddress", async (req, res) => {
   const reqData = req.query;
   const { openId, addressId } = reqData;
   let mysql = `
    SELECT * FROM address WHERE openId = '${openId}' ${
     addressId ? `AND addressId = ${addressId}` : ""
-  } ORDER BY is_default DESC
+  } ORDER BY is_default DESC, createTime DESC
   `;
   await pool.query(mysql).then((data) => {
     console.log(data[0]);
@@ -48,6 +94,61 @@ async function changeDefault(openId) {
 }
 
 // 新增地址
+/**
+ * @swagger
+ * /addAddress:
+ *   post:
+ *     summary: 新增地址
+ *     tags: [Address]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             required: ["recipients","phone","province","city","county","full_address"]
+ *             properties:
+ *               recipients:
+ *                 type: string
+ *                 default: ""
+ *                 description: 收件人
+ *               phone:
+ *                 type: string
+ *                 default: ""
+ *                 description: 电话号码
+ *               province:
+ *                 type: string
+ *                 default: ""
+ *                 description: 省
+ *               city:
+ *                 type: string
+ *                 default: ""
+ *                 description: 市
+ *               county:
+ *                 type: string
+ *                 default: ""
+ *                 description: 区县
+ *               full_address:
+ *                 type: string
+ *                 default: ""
+ *                 description: 详细地址
+ *               is_default:
+ *                 type: string
+ *                 default: ""
+ *                 description: 是否为默认地址，1：是，0：不是
+ *     responses:
+ *       200:
+ *         description: 成功新增地址
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   default: 新增地址成功
+ */
 router.post("/addAddress", async (req, res) => {
   const reqData = req.body;
   const {
@@ -90,6 +191,61 @@ router.post("/addAddress", async (req, res) => {
 });
 
 // 修改地址
+/**
+ * @swagger
+ * /setAddress:
+ *   post:
+ *     summary: 修改地址
+ *     tags: [Address]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             required: ["recipients","phone","province","city","county","full_address"]
+ *             properties:
+ *               recipients:
+ *                 type: string
+ *                 default: ""
+ *                 description: 收件人
+ *               phone:
+ *                 type: string
+ *                 default: ""
+ *                 description: 电话号码
+ *               province:
+ *                 type: string
+ *                 default: ""
+ *                 description: 省
+ *               city:
+ *                 type: string
+ *                 default: ""
+ *                 description: 市
+ *               county:
+ *                 type: string
+ *                 default: ""
+ *                 description: 区县
+ *               full_address:
+ *                 type: string
+ *                 default: ""
+ *                 description: 详细地址
+ *               is_default:
+ *                 type: string
+ *                 default: ""
+ *                 description: 是否为默认地址，1：是，0：不是
+ *     responses:
+ *       200:
+ *         description: 成功修改地址
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   default: 修改地址成功
+ */
 router.post("/setAddress", async (req, res) => {
   const reqData = req.body;
   reqData.is_default = Number(reqData.is_default);
@@ -125,6 +281,41 @@ router.post("/setAddress", async (req, res) => {
 });
 
 // 修改默认地址选项
+/**
+ * @swagger
+ * /setDefaultAddress:
+ *   post:
+ *     summary: 修改默认地址选项
+ *     tags: [Address]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             required: ["addressId","is_default"]
+ *             properties:
+ *               addressId:
+ *                 type: string
+ *                 default: ""
+ *                 description: 地址id
+ *               is_default:
+ *                 type: string
+ *                 default: ""
+ *                 description: 是否为默认地址，1：是，0：不是
+ *     responses:
+ *       200:
+ *         description: 成功修改默认地址选项
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   default: 修改默认地址选项成功
+ */
 router.post("/setDefaultAddress", async (req, res) => {
   const reqData = req.body;
   const { openId, addressId, is_default = 0 } = reqData;
@@ -149,6 +340,37 @@ router.post("/setDefaultAddress", async (req, res) => {
 });
 
 // 删除地址
+/**
+ * @swagger
+ * /deleteAddress:
+ *   post:
+ *     summary: 删除地址
+ *     tags: [Address]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             required: ["addressId"]
+ *             properties:
+ *               addressId:
+ *                 type: string
+ *                 default: ""
+ *                 description: 地址id
+ *     responses:
+ *       200:
+ *         description: 成功删除地址
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   default: 删除地址成功
+ */
 router.post("/deleteAddress", async (req, res) => {
   const reqData = req.body;
   const { addressId } = reqData;

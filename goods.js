@@ -2,6 +2,45 @@ const router = require("express").Router();
 const pool = require("./mysqlInfo");
 
 // 获取商品列表
+/**
+ * @swagger
+ * /goods:
+ *   get:
+ *     summary: 获取商品列表
+ *     tags: [Goods]
+ *     security:
+ *       - jwtAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: pageNum
+ *         required: true
+ *         description: 第几页
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: pageSize
+ *         required: true
+ *         description: 每页多少条数据
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: category_ids
+ *         required: true
+ *         description: 分类id
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: 成功获取商品列表
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   defautl: 获取商品列表成功
+ */
 router.get("/goods", async (req, res) => {
   const reqData = req.query;
   const { pageSize, pageNum, category_ids } = reqData;
@@ -44,6 +83,33 @@ router.get("/goods", async (req, res) => {
 });
 
 // 获取商品详情信息
+/**
+ * @swagger
+ * /goodsDetail:
+ *   get:
+ *     summary: 获取商品详情信息
+ *     tags: [Goods]
+ *     security:
+ *       - jwtAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: goodsId
+ *         required: true
+ *         description: 商品id
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: 成功获取商品详情信息
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   defautl: 获取商品详情信息成功
+ */
 router.get("/goodsDetail", async (req, res) => {
   const reqData = req.query;
   const { goodsId } = reqData;
