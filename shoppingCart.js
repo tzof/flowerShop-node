@@ -22,39 +22,70 @@ router.get("/getShoppingCartTotal", async (req, res) => {
 router.get("/getShoppingCart", async (req, res) => {
   const reqData = req.query;
   const { openId } = reqData;
-  let mysql = `
+  // 获取连接
+  const connection = await pool.getConnection().catch((err) => {
+    console.log(err);
+    throw err;
+  });
+  // 开始事务 只有connection连接下的原型链才包含beginTransaction pool连接池无法直接调用
+  await connection.beginTransaction().catch((err) => {
+    console.log(err);
+    connection.release();
+    throw err;
+  });
+  try {
+    let mysql = `
     SELECT * FROM shopping_cart WHERE openId = '${openId}' ORDER BY createTime DESC;
   `;
-  await pool.query(mysql).then((data) => {
-    let promiseArr = [];
-    data[0].forEach((item) => {
-      const promiseItem = new Promise(async (resolve, reject) => {
-        let goodsId = item.goodsId;
-        // 查询商品信息并存入返回数据
-        mysql = `
+    await connection.query(mysql).then((data) => {
+      let promiseArr = [];
+      data[0].forEach((item) => {
+        const promiseItem = new Promise(async (resolve, reject) => {
+          let goodsId = item.goodsId;
+          // 查询商品信息并存入返回数据
+          mysql = `
           SELECT * FROM goods WHERE goodsId = ${goodsId};
         `;
-        await pool
-          .query(mysql)
-          .then((data) => {
-            item.goodsInfo = data[0][0];
-            item.totalPrice = item.goodsInfo.discounted_price * item.count;
-          })
-          .catch((err) => {
-            console.log("error:查找购物车商品详情出错", err);
+          await connection
+            .query(mysql)
+            .then((data) => {
+              item.goodsInfo = data[0][0];
+              item.totalPrice = item.goodsInfo.discounted_price * item.count;
+            })
+            .catch((err) => {
+              console.log("error:查找购物车商品详情出错", err);
+            });
+          resolve();
+        });
+        promiseArr.push(promiseItem);
+      });
+      Promise.all(promiseArr)
+        .then(async () => {
+          // 提交事务
+          await connection.commit().then(() => {
+            res.json({
+              code: 200,
+              msg: "获取购物车成功",
+              data: data[0],
+            });
           });
-        resolve();
-      });
-      promiseArr.push(promiseItem);
+        })
+        .catch((err) => {
+          console.log(err);
+          throw err;
+        });
     });
-    Promise.all(promiseArr).then(() => {
-      res.json({
-        code: 200,
-        msg: "获取购物车成功",
-        data: data[0],
-      });
+  } catch (err) {
+    res.send({
+      code: 500,
+      msg: err + "获取购物车失败",
     });
-  });
+    // 回滚当前的事务
+    await connection.rollback();
+  } finally {
+    // 释放连接 将连接返回到连接池
+    await connection.release();
+  }
 });
 
 // 添加修改购物车
@@ -156,7 +187,7 @@ router.post("/setMinusShoppingCartCount", async (req, res) => {
         let mysql = `
           SELECT count FROM shopping_cart WHERE openId = '${openId}' AND goodsId = ${goodsId};
         `;
-        const dataCount = (await pool.query(mysql))[0][0].count;
+        const dataCount = (await connection.query(mysql))[0][0].count;
         const newCount = dataCount - count;
         // 减去后的数量小于等于0则删除
         if (newCount === 0 || newCount < 0) {
@@ -170,7 +201,7 @@ router.post("/setMinusShoppingCartCount", async (req, res) => {
             UPDATE shopping_cart SET count = ${newCount} WHERE openId = '${openId}' AND goodsId = ${goodsId};
           `;
         }
-        await pool.query(mysql);
+        await connection.query(mysql);
         console.log(
           "购物车商品：" + item.goodsId + "数量修改成功：" + newCount
         );
@@ -178,16 +209,26 @@ router.post("/setMinusShoppingCartCount", async (req, res) => {
       });
       promiseArr.push(promiseItem);
     });
-    await Promise.all(promiseArr);
-    // 提交事务
-    await connection.commit().then(() => {
-      res.json({
-        code: 200,
-        msg: "购物车商品数量修改成功",
-      });
+    await Promise.all(promiseArr).then(async () => {
+      // 提交事务
+      await connection
+        .commit()
+        .then(() => {
+          res.json({
+            code: 200,
+            msg: "购物车商品数量修改成功",
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          throw err;
+        });
     });
   } catch (err) {
-    console.log(err);
+    res.send({
+      code: 500,
+      msg: err + "购物车商品数量修改失败",
+    });
     // 回滚当前的事务
     await connection.rollback();
   } finally {

@@ -94,7 +94,9 @@ router.post("/addOrders", async (req, res) => {
       });
       promiseArr.push(promiseItem);
     });
-    await Promise.all(promiseArr);
+    await Promise.all(promiseArr).catch((err) => {
+      throw err;
+    });
     // 创建订单 插入orders表
     // orders_status 订单状态 0.已经创建 1.已支付 2.商家确定 3.已经发货 4.已收货 5.交易完成
     let orders_status = 1;
@@ -152,13 +154,22 @@ router.post("/addOrders", async (req, res) => {
       });
       promiseArr.push(promiseItem);
     });
-    await Promise.all(promiseArr);
-    res.send({
-      code: 200,
-      msg: "创建订单成功",
-    });
+    await Promise.all(promiseArr)
+      .then(() => {
+        res.send({
+          code: 200,
+          msg: "创建订单成功",
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        throw err;
+      });
   } catch (err) {
-    console.log(err);
+    res.send({
+      code: 500,
+      msg: err + "创建订单失败",
+    });
     // 回滚当前的事务
     await connection.rollback();
   } finally {
@@ -213,13 +224,22 @@ router.get("/getOrders", async (req, res) => {
       });
       promiseArr.push(promiseItem);
     });
-    await Promise.all(promiseArr);
-    res.send({
-      code: 200,
-      msg: "查询订单表和订单子表成功",
-      data: resData,
-      total,
-    });
+    await Promise.all(promiseArr)
+      .then(() => {
+        res.send({
+          code: 200,
+          msg: "查询订单表和订单子表成功",
+          data: resData,
+          total,
+        });
+      })
+      .catch((err) => {
+        res.send({
+          code: 500,
+          msg: err + "查询订单表和订单子表失败",
+        });
+        throw err;
+      });
   });
 });
 
