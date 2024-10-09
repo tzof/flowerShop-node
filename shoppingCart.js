@@ -22,7 +22,6 @@ router.get("/getShoppingCartTotal", async (req, res) => {
 router.get("/getShoppingCart", async (req, res) => {
   const reqData = req.query;
   const { openId } = reqData;
-  console.log(reqData);
   let mysql = `
     SELECT * FROM shopping_cart WHERE openId = '${openId}' ORDER BY createTime DESC;
   `;
@@ -171,7 +170,7 @@ router.post("/setMinusShoppingCartCount", async (req, res) => {
             UPDATE shopping_cart SET count = ${newCount} WHERE openId = '${openId}' AND goodsId = ${goodsId};
           `;
         }
-        await pool.query(mysql)
+        await pool.query(mysql);
         console.log(
           "购物车商品：" + item.goodsId + "数量修改成功：" + newCount
         );

@@ -60,7 +60,7 @@ router.post("/addOrders", async (req, res) => {
         const mysql = `
           SELECT * FROM goods WHERE goodsId = ${goodsId}
         `;
-        await pool.query(mysql).then((data) => {
+        await connection.query(mysql).then((data) => {
           // 防止\r转义字符导致mysql报错的问题
           for (let key in data[0][0]) {
             let resData = JSON.stringify(data[0][0][key]);
@@ -78,7 +78,7 @@ router.post("/addOrders", async (req, res) => {
           let mysql = `
               UPDATE goods SET stock = ${newStock} WHERE goodsId = ${goodsId}
           `;
-          await pool.query(mysql).then((data) => {
+          await connection.query(mysql).then((data) => {
             console.log(`减少商品id：${goodsId} 库存成功，数量：${newStock}`);
           });
           item.goodsInfo.stock = newStock;
@@ -104,7 +104,7 @@ router.post("/addOrders", async (req, res) => {
       .toString()}, ${orders_status})
       `;
     // mysql2库 执行非查询语句（如 INSERT, UPDATE, DELETE 等）时返回的对象 ResultSetHeader
-    const ResultSetHeader = await pool.query(mysql, [
+    const ResultSetHeader = await connection.query(mysql, [
       openId,
       address,
       recipients,
@@ -125,14 +125,14 @@ router.post("/addOrders", async (req, res) => {
     mysql = `
           SELECT createTime FROM orders WHERE ordersId = ${ordersId}
       `;
-    const ordersCreateTime = (await pool.query(mysql))[0][0].createTime;
+    const ordersCreateTime = (await connection.query(mysql))[0][0].createTime;
     // padStart 方法用于在字符串的开始处填充指定的字符，直到达到指定的长度。
     const orders_number =
       ordersCreateTime.getTime() + String(ordersId).padStart(5, "0");
     mysql = `
           UPDATE orders SET orders_number = '${orders_number}' WHERE ordersId = ${ordersId}
       `;
-    await pool.query(mysql).then((data) => {
+    await connection.query(mysql).then((data) => {
       console.log("更新订单编号成功");
     });
     // 根据goodsList插入orders_item子项表格 记录订单中的所有商品信息
@@ -145,7 +145,7 @@ router.post("/addOrders", async (req, res) => {
         mysql = `INSERT INTO orders_item (ordersId, goodsId, count, price, goodsInfo) VALUES (${ordersId}, ${goodsId}, ${count}, ${
           goodsInfo.discounted_price
         }, '${JSON.stringify(goodsInfo)}')`;
-        await pool.query(mysql).then((res) => {
+        await connection.query(mysql).then((res) => {
           console.log("更新orders_item子项成功");
           resolve();
         });
@@ -185,7 +185,7 @@ router.get("/getOrders", async (req, res) => {
   let whereAnd = "";
   // 如果有传状态则按状态查询
   if (status) {
-    status = status? Number(status) : 0;
+    status = status ? Number(status) : 0;
     // orders_status 订单状态 0.已经创建 1.已支付 2.商家确定 3.已经发货 4.已收货 5.交易完成
     if (status == 3) {
       whereAnd = ` AND (orders_status = 3 OR orders_status = 2 OR orders_status = 1)`;
@@ -255,7 +255,7 @@ router.get("/getOrdersTotal", async (req, res) => {
   let whereAnd = "";
   // 如果有传状态则按状态查询
   if (status) {
-    status = status? Number(status) : 0;
+    status = status ? Number(status) : 0;
     // orders_status 订单状态 0.已经创建 1.已支付 2.商家确定 3.已经发货 4.已收货 5.交易完成
     if (status == 3) {
       whereAnd = ` AND (orders_status = 3 OR orders_status = 2 OR orders_status = 1)`;
