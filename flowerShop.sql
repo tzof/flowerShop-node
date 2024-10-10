@@ -4,14 +4,14 @@
  Source Server         : 阿里云ECS
  Source Server Type    : MySQL
  Source Server Version : 80401 (8.4.1)
- Source Host           : 
+ Source Host           : locaolhost:3306
  Source Schema         : flowershop
 
  Target Server Type    : MySQL
  Target Server Version : 80401 (8.4.1)
  File Encoding         : 65001
 
- Date: 10/10/2024 18:24:24
+ Date: 10/10/2024 19:56:43
 */
 
 SET NAMES utf8mb4;
@@ -157,7 +157,7 @@ CREATE TABLE `orders`  (
   INDEX `openIdANDorders_status`(`openId` ASC, `orders_status` ASC) USING BTREE,
   INDEX `orders_status`(`orders_status` ASC) USING BTREE,
   CONSTRAINT `order_openId` FOREIGN KEY (`openId`) REFERENCES `user` (`openId`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 466 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 468 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for orders_item
@@ -175,7 +175,7 @@ CREATE TABLE `orders_item`  (
   INDEX `goodsId`(`goodsId` ASC) USING BTREE,
   CONSTRAINT `orders_item_goodsId` FOREIGN KEY (`goodsId`) REFERENCES `goods` (`goodsId`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `orders_item_ordersId` FOREIGN KEY (`ordersId`) REFERENCES `orders` (`ordersId`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1198 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1200 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for shopping_cart

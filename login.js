@@ -36,8 +36,8 @@ const jwt = require("jsonwebtoken");
 // 登录
 router.post("/login", async (req, res) => {
   const { code } = req.body;
-  const appId = process.env.WECHARTPROGRAM_APPID;
-  const secret = process.env.WECHARTPROGRAM_SECRET;
+  const appId = process.env.WECHARTPROGRAM_APPID; // 微信小程序的AppID
+  const secret = process.env.WECHARTPROGRAM_SECRET; // 微信小程序的AppSecret
   if (!code) {
     res.json({
       code: 0,
@@ -90,7 +90,7 @@ router.post("/login", async (req, res) => {
       { openId: response.openid },
       process.env.JWT_SECRET_KEY,
       {
-        expiresIn: 60 * 60,
+        expiresIn: Number(process.env.JWT_EXPIRE_TIME),
       }
     );
     // 创建或更新ip

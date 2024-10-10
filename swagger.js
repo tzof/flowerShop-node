@@ -4,7 +4,7 @@ const options = {
   definition: {
     openapi: "3.1.0",
     info: {
-      title: "TZOF花城api文档",
+      title: "TZOF花城小程序api文档",
       version: "1.0.0",
       description:
         "nodejs+express+mysql2+swagger+aliyunOssSDK实现花城小程序后台api文档",
@@ -30,7 +30,7 @@ const options = {
     },
     servers: [
       {
-        url: "https://tzof.net:217", // 根据实际情况修改
+        url: process.env.SWAGGER_HOST, // 根据实际情况修改
       },
     ],
   },

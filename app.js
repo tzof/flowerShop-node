@@ -28,7 +28,11 @@ const app = express();
 app.use(cors());
 
 // swagger文档
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use(
+  process.env.SWAGGER_API_PATH,
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocs)
+);
 
 // 解析json
 app.use(express.json());
@@ -37,9 +41,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // JWT 验证中间件
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1]; // 解析Bearer JWT格式的token
+  const token =
+    authHeader &&
+    (authHeader.split(" ")[1] ? authHeader.split(" ")[1] : authHeader); // 解析Bearer JWT格式的token
   // 如果没有提供 token，则返回 403 Forbidden禁止进入的
-  if (token == null) {
+  if (!token) {
     return res.json({
       code: 403,
       msg: "token未提供",
@@ -78,8 +84,11 @@ app.use((req, res, next) => {
   console.log("请求参数", req.query);
   // console.log("响应体", res.body);
   if (routeNeedsAuth) {
-    authenticateToken(req, res, next);
-    // next();
+    if (process.env.JWT_STATUS == "true") {
+      authenticateToken(req, res, next);
+    } else {
+      next();
+    }
   } else {
     next();
   }
@@ -96,14 +105,20 @@ app.use(shoppingCartApi); // 购物车
 app.use(addressApi); // 地址
 app.use(ordersApi); // 订单
 
-// 配置SSL证书和密钥
-const options = {
-  key: fs.readFileSync("/usr/local/nginx/conf/cert/tzof.net.key"), // 私钥位置
-  cert: fs.readFileSync("/usr/local/nginx/conf/cert/tzof.net.pem"), // 证书位置
-};
+if (process.env.HTTPS_STATUS == "true") {
+  // 配置SSL证书和密钥
+  const options = {
+    key: fs.readFileSync(process.env.HTTPS_KEY_PATH), // 私钥位置
+    cert: fs.readFileSync(process.env.HTTPS_CERT_PATH), // 证书位置
+  };
 
-const server = https.createServer(options, app);
+  const server = https.createServer(options, app);
 
-server.listen(217, () => {
-  console.log("217已开启");
-});
+  server.listen(process.env.HTTPS_PORT, () => {
+    console.log("https-" + process.env.HTTPS_PORT + "-已开启");
+  });
+} else {
+  app.listen(process.env.HTTP_PORT, () => {
+    console.log("http-" + process.env.HTTP_PORT + "-已开启");
+  });
+}
