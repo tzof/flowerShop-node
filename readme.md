@@ -109,7 +109,7 @@ WECHARTPROGRAM_SECRET=secret // 微信小程序的AppSecret
 OSS_REGION=oss-cn-hangzhou // 阿里云oss区域
 OSS_ACCESS_KEY_ID=accessKeyId // 阿里云oss的accessKeyId
 OSS_ACCESS_KEY_SECRET=accessKeySecret // 阿里云oss的accessKeySecret
-OSS_BUCKET=tzof-oss // 阿里云oss的bucket名称
+OSS_BUCKET=oss // 阿里云oss的bucket名称
 OSS_PATH=flowerShop // 阿里云oss的存储路径(哪个文件夹下)
 ```
 
