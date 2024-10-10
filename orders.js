@@ -63,12 +63,12 @@ const pool = require("./mysqlInfo");
  *                 description: 订单备注
  *               totalPrice:
  *                 type: string
- *                 default: "总价 "
- *                 description: 总价            
+ *                 default: "总价"
+ *                 description: 总价
  *               goodsList:
  *                 type: array
  *                 default: "待下单的商品数组，如：[{goodsId: 1, count: 2},{goodsId: 2, count: 8}] 数组形式每个元素都是一个对象存放商品goodsId和数量count"
- *                 description: "待下单的商品数组，如：[{goodsId: 1, count: 2},{goodsId: 2, count: 8}] 数组形式每个元素都是一个对象存放商品goodsId和数量count" 
+ *                 description: "待下单的商品数组，如：[{goodsId: 1, count: 2},{goodsId: 2, count: 8}] 数组形式每个元素都是一个对象存放商品goodsId和数量count"
  *     responses:
  *       200:
  *         description: 成功新建订单
@@ -244,18 +244,27 @@ router.post("/addOrders", async (req, res) => {
       promiseArr.push(promiseItem);
     });
     await Promise.all(promiseArr)
-      .then(() => {
-        res.send({
-          code: 200,
-          msg: "创建订单成功",
-        });
+      .then(async () => {
+        // 提交事务
+        await connection
+          .commit()
+          .then(() => {
+            res.json({
+              code: 200,
+              msg: "创建订单成功",
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            throw err;
+          });
       })
       .catch((err) => {
         console.log(err);
         throw err;
       });
   } catch (err) {
-    res.send({
+    res.json({
       code: 500,
       msg: err + "创建订单失败",
     });
@@ -353,7 +362,7 @@ router.get("/getOrders", async (req, res) => {
     });
     await Promise.all(promiseArr)
       .then(() => {
-        res.send({
+        res.json({
           code: 200,
           msg: "查询订单表和订单子表成功",
           data: resData,
@@ -361,7 +370,7 @@ router.get("/getOrders", async (req, res) => {
         });
       })
       .catch((err) => {
-        res.send({
+        res.json({
           code: 500,
           msg: err + "查询订单表和订单子表失败",
         });
@@ -411,7 +420,7 @@ router.get("/getOrdersDetail", async (req, res) => {
     await pool.query(mysql).then((data) => {
       resData.goodsList = data[0];
     });
-    res.send({
+    res.json({
       code: 200,
       msg: "查询订单详情成功",
       data: resData,
@@ -467,7 +476,7 @@ router.get("/getOrdersTotal", async (req, res) => {
   }
   mysql += whereAnd;
   await pool.query(mysql).then((data) => {
-    res.send({
+    res.json({
       code: 200,
       msg: "查询订单总数成功",
       data: data[0][0].total,
