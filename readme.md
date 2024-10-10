@@ -23,9 +23,12 @@ TZOF 花城花小程序后端是为花城小程序提供数据支持和服务的
 - **设置默认地址** - `POST /setDefaultAddress`
 - **删除地址** - `POST /deleteAddress`
 
-### 商品分类与详情
+### 层级分类
 
 - **获取层级分类** - `GET /category`
+
+### 商品与详情
+
 - **获取商品列表** - `GET /goods`
 - **获取商品详情信息** - `GET /goodsDetail`
 
@@ -81,7 +84,7 @@ npm install
 
 ### 3. 配置环境变量
 
-复制 `.env.example` 到 `.env`。根据您的实际部署情况，修改 `.env` 文件并填写相应的配置信息。
+复制 `.env.example` 到 `.env`文件。根据您的实际部署情况，修改 `.env` 文件并填写相应的配置信息。
 
 ```bash
 HTTP_PORT=80 // http服务端口
