@@ -11,7 +11,7 @@
  Target Server Version : 80401 (8.4.1)
  File Encoding         : 65001
 
- Date: 08/10/2024 22:17:32
+ Date: 10/10/2024 18:24:24
 */
 
 SET NAMES utf8mb4;
@@ -37,8 +37,10 @@ CREATE TABLE `address`  (
   INDEX `openId`(`openId` ASC) USING BTREE,
   INDEX `is_default`(`is_default` ASC) USING BTREE,
   INDEX `addressId`(`addressId` ASC) USING BTREE,
+  INDEX `openIdANDis_default`(`openId` ASC, `is_default` ASC) USING BTREE,
+  INDEX `addressIdANDopenId`(`addressId` ASC, `openId` ASC) USING BTREE,
   CONSTRAINT `address_openId` FOREIGN KEY (`openId`) REFERENCES `user` (`openId`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 25 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for category
@@ -151,9 +153,11 @@ CREATE TABLE `orders`  (
   `updateTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`ordersId`) USING BTREE,
   INDEX `openId`(`openId` ASC) USING BTREE,
-  INDEX `orderId`(`ordersId` ASC) USING BTREE,
+  INDEX `ordersId`(`ordersId` ASC) USING BTREE,
+  INDEX `openIdANDorders_status`(`openId` ASC, `orders_status` ASC) USING BTREE,
+  INDEX `orders_status`(`orders_status` ASC) USING BTREE,
   CONSTRAINT `order_openId` FOREIGN KEY (`openId`) REFERENCES `user` (`openId`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 169 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 466 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for orders_item
@@ -171,7 +175,7 @@ CREATE TABLE `orders_item`  (
   INDEX `goodsId`(`goodsId` ASC) USING BTREE,
   CONSTRAINT `orders_item_goodsId` FOREIGN KEY (`goodsId`) REFERENCES `goods` (`goodsId`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `orders_item_ordersId` FOREIGN KEY (`ordersId`) REFERENCES `orders` (`ordersId`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 610 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1198 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for shopping_cart
@@ -190,9 +194,10 @@ CREATE TABLE `shopping_cart`  (
   INDEX `goodsId`(`goodsId` ASC) USING BTREE,
   INDEX `carId`(`carId` ASC) USING BTREE,
   INDEX `test`(`openId` ASC, `goodsId` ASC) USING BTREE,
+  INDEX `openIdANDgoodsId`(`openId` ASC, `goodsId` ASC) USING BTREE,
   CONSTRAINT `shopping_cart_goodsId` FOREIGN KEY (`goodsId`) REFERENCES `goods` (`goodsId`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `shopping_cart_openId` FOREIGN KEY (`openId`) REFERENCES `user` (`openId`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 211 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 663 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for user
