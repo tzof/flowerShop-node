@@ -121,12 +121,13 @@ node app.js
 
 ### 5. 访问 api 接口文档及测试接口
 
-通过在`.env`文件中配置好的 swagger 地址`SWAGGER_HOST`和路径`SWAGGER_API_PATH`，即可通过浏览器访问 api 接口文档及测试接口。例如：https://tzof.net:217/api-docs
+通过在`.env`文件中配置好的 swagger 地址`SWAGGER_HOST`和路径`SWAGGER_API_PATH`，即可通过浏览器访问 api 接口文档及测试接口。例如：[https://tzof.net:217/api-docs](https://tzof.net:217/api-docs/)
 
 ## 初始化 Mysql 数据库
 
 使用`flowerShop.sql`文件初始化数据库。
 
-## Token认证
+## JWT Token认证
 
-所有需要认证的请求都需要在 HTTP 头部包含有效的 Token。可以通过 POST /login 接口获得 Token。
+所有需要认证的请求都需要在 HTTP 头部包含有效的 Token。可以通过 POST /login 接口获得 Token。<br>
+如果需要**关闭JWT认证**则在`.env`文件中将`JWT_STATUS`设置为`false`
