@@ -6,7 +6,7 @@
 
 ## 项目简介
 
-TZOF 花城微信小程序后端是为花城微信小程序提供数据支持和服务的核心部分。本项目使用 Node.js + Express 框架开发，数据库采用 MySQL，并通过 Swagger 提供了详细的 API 文档。此外，还集成了阿里云 OSS 服务来处理文件上传。
+TZOF 花城微信小程序后端是为[花城微信小程序](https://github.com/tzof/flowerShop-wechartMiniProgram)提供数据支持和服务的核心部分。本项目使用 Node.js + Express 框架开发，数据库采用 MySQL，并通过 Swagger 提供了详细的 API 文档。此外，还集成了阿里云 OSS 服务来处理文件上传。
 
 ### 前端仓库 微信小程序
 [TZOF花城微信小程序仓库](https://github.com/tzof/flowerShop-wechartMiniProgram)
