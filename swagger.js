@@ -7,7 +7,7 @@ const options = {
       title: "TZOF花城小程序api文档",
       version: "1.0.0",
       description:
-        "nodejs+express+mysql2+swagger+aliyunOssSDK实现花城小程序后台api文档",
+        "nodejs+express+mysql2+swagger+aliyunOssSDK实现花城小程序后台api文档。github地址：https://github.com/tzof/flowerShop-node",
     },
     
     components: { // 全局自定义组件

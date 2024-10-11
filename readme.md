@@ -1,4 +1,4 @@
-# TZOF 花城小程序后端
+# TZOF 花城微信小程序后端-Node
 
 [![GitHub license](https://img.shields.io/github/license/tzof/flowerShop-node.svg)](https://github.com/tzof/flowerShop-node/blob/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/tzof/flowerShop-node.svg)](https://github.com/tzof/flowerShop-node/issues)
@@ -6,11 +6,15 @@
 
 ## 项目简介
 
-TZOF 花城花小程序后端是为花城小程序提供数据支持和服务的核心部分。本项目使用 Node.js + Express 框架开发，数据库采用 MySQL，并通过 Swagger 提供了详细的 API 文档。此外，还集成了阿里云 OSS 服务来处理文件上传。
+TZOF 花城微信小程序后端是为花城微信小程序提供数据支持和服务的核心部分。本项目使用 Node.js + Express 框架开发，数据库采用 MySQL，并通过 Swagger 提供了详细的 API 文档。此外，还集成了阿里云 OSS 服务来处理文件上传。
+
+### 前端仓库 微信小程序
+[TZOF花城微信小程序仓库](https://github.com/tzof/flowerShop-wechartMiniProgram)
+
 
 ## API 接口文档
 
-[TZOF 花城小程序 api 文档](https://tzof.net:217/api-docs/)
+[TZOF 花城小程序接口 api 文档](https://tzof.net:217/api-docs/)
 
 ## 功能概览
 
